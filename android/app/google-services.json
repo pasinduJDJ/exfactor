@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "416479458142",
+    "project_id": "exfactor-69b66",
+    "storage_bucket": "exfactor-69b66.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:416479458142:android:ab693ed42fcbd8bfe715cf",
+        "android_client_info": {
+          "package_name": "com.example.exfactor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIBYF4wn-QCgN4RESqE4Uvzz5uzIMEcQE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
