@@ -1,5 +1,10 @@
+import 'package:exfactor/screens/admin/admin_home.dart';
+import 'package:exfactor/screens/admin/admin_main_screen.dart';
+import 'package:exfactor/screens/supervisor/supervisor_main_screen.dart';
+import 'package:exfactor/screens/technical/technical_main_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:exfactor/screens/home_screen.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:exfactor/utils/theme.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -9,21 +14,36 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  //initialized email, and password
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  void _handleLogin() {
+  // handle User login logic
+  void _handleLogin() async {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
-    // Here you would typically validate credentials
-    // For now, we'll just navigate to home
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const MyHomePage(title: 'Exfactor'),
-      ),
-    );
+    if (email.isEmpty) {
+      _showToast("Please enter email address or username");
+      return;
+    } else if (password.isEmpty) {
+      _showToast("Please enter your password");
+      return;
+    } else if (email == 'admin' || password == 'admin') {
+      Navigator.push(context, MaterialPageRoute(builder: (_) {
+        return const AdminMainScreen();
+      }));
+    } else if (email == 'supervisor' || password == 'supervisor') {
+      Navigator.push(context, MaterialPageRoute(builder: (_) {
+        return const SupervisorMainScreen();
+      }));
+    } else if (email == 'technical' || password == 'technical') {
+      Navigator.push(context, MaterialPageRoute(builder: (_) {
+        return const TechnicalMainScreen();
+      }));
+    } else {
+      _showToast("No role found for this user.");
+    }
   }
 
   @override
@@ -134,4 +154,15 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+}
+
+void _showToast(String message) {
+  Fluttertoast.showToast(
+    msg: message,
+    toastLength: Toast.LENGTH_SHORT,
+    gravity: ToastGravity.BOTTOM,
+    backgroundColor: AppTheme.errColor,
+    textColor: Colors.white,
+    fontSize: 14.0,
+  );
 }

@@ -1,43 +1,45 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color primaryColor = Color.fromRGBO(0, 32, 85, 0); // Deep Purple
-  static const Color secondaryColor = Color(0xFF625B71); // Secondary variant
-  static const Color backgroundColor = Colors.white;
-  static const Color errorColor = Color(0xFFB3261E);
+  static const Color themeColor = Color.fromRGBO(0, 32, 85, 0);
+  static const Color secondaryColor = Color(0xFF625B71); 
+  static const Color bgColor = Color.fromRGBO(237, 242, 244, 0);
+  static const Color errColor = Color(0xFFB3261E);
 
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: primaryColor,
+      seedColor: themeColor,
       brightness: Brightness.light,
     ),
-    scaffoldBackgroundColor: backgroundColor,
+    scaffoldBackgroundColor: bgColor,
     appBarTheme: const AppBarTheme(
-      backgroundColor: primaryColor,
-      foregroundColor: Colors.white,
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black,
       elevation: 0,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: primaryColor,
+        backgroundColor: themeColor,
         foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 5),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: Colors.grey[100],
+      fillColor: Colors.white,
+      
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
+        
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: primaryColor),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: themeColor),
       ),
     ),
   );

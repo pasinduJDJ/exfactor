@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:exfactor/screens/home_screen.dart';
 import 'package:exfactor/screens/login_page.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -16,21 +15,14 @@ class _SplashScreenState extends State<SplashScreen> {
     _navigateToLogin();
   }
 
-  _navigateToHome() async {
-    await Future.delayed(const Duration(seconds: 3));
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-          builder: (context) => const MyHomePage(title: 'Exfactor')),
-    );
-  }
-
   _navigateToLogin() async {
-    await Future.delayed(const Duration(seconds: 3));
-    if (!mounted) return;
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const LoginPage()));
+    await Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        return;
+      }
+    });
+    Navigator.push(
+        context, MaterialPageRoute(builder: (_) => const LoginPage()));
   }
 
   @override
