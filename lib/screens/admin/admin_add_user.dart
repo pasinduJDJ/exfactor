@@ -127,6 +127,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
+      print("Picked image path: ${image.path}");
       setState(() {
         _pickedImage = File(image.path);
       });
