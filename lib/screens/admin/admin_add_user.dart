@@ -7,6 +7,9 @@ import '../../widgets/common/custom_text_field.dart';
 import '../../widgets/common/responsive_layout.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import '../../models/user_model.dart';
+import '../../services/firebase_service.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class AddUserScreen extends StatefulWidget {
   const AddUserScreen({super.key});
@@ -30,15 +33,25 @@ class _AddUserScreenState extends State<AddUserScreen> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
-  String _selectedRole = 'Technician';
-  String _selectedSupervisor = "ABD";
+  String _selectedRole = 'Select Role';
+  String _selectedSupervisor = "Select Supervisor";
   bool _isLoading = false;
   DateTime? _selectedDOB;
   DateTime? _selectedJoinDate;
   DateTime? _selectedDesignationDate;
 
-  final List<String> _roles = ['Technician', 'Supervisor', 'Admin'];
-  final List<String> _supervisour = ["ABCD", "EFGH", "IJKL"];
+  final List<String> _roles = [
+    'Select Role',
+    'Technician',
+    'Supervisor',
+    'Admin'
+  ];
+  final List<String> _supervisor = [
+    'Select Supervisor',
+    'ABCD',
+    'EFGH',
+    'IJKL'
+  ];
 
   @override
   void dispose() {
@@ -123,28 +136,120 @@ class _AddUserScreenState extends State<AddUserScreen> {
   Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    // Validate required fields
+    if (_pickedImage == null) {
+      _showToast('Please select a profile image');
+      return;
+    }
+
+    if (_selectedRole == 'Select Role') {
+      _showToast('Please select a role');
+      return;
+    }
+
+    if (_selectedSupervisor == 'Select Supervisor') {
+      _showToast('Please select a supervisor');
+      return;
+    }
+
+    if (_selectedDOB == null) {
+      _showToast('Please select date of birth');
+      return;
+    }
+
+    if (_selectedJoinDate == null) {
+      _showToast('Please select join date');
+      return;
+    }
+
+    if (_selectedDesignationDate == null) {
+      _showToast('Please select designation date');
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Implement user creation logic
-      await Future.delayed(const Duration(seconds: 2)); // Simulated API call
+      // Upload profile image
+      final imageUrl = await FirebaseService.uploadProfileImage(_pickedImage!);
+
+      // Create user model
+      final user = UserModel(
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        email: _emailController.text.trim(),
+        mobile: _phoneController.text.trim(),
+        dob: _selectedDOB!,
+        joinDate: _selectedJoinDate!,
+        designationDate: _selectedDesignationDate!,
+        role: _selectedRole,
+        supervisorId: _selectedSupervisor,
+        profileImageUrl: imageUrl,
+        emergencyContact: {
+          'name': _emergencyContactNameController.text.trim(),
+          'number': _emergencyContactNumberController.text.trim(),
+          'relation': _emergencyContactRelationController.text.trim(),
+        },
+        password: _passwordController.text,
+      );
+
+      // Register user
+      await FirebaseService.registerUser(user, _passwordController.text);
+
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User created successfully!')),
-        );
+        _showToast('User registered successfully!');
+        // Clear all fields after successful registration
+        _clearForm();
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
+        _showToast(e.toString());
       }
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _clearForm() {
+    _firstNameController.clear();
+    _lastNameController.clear();
+    _userNameconroller.clear();
+    _emailController.clear();
+    _phoneController.clear();
+    _dobController.clear();
+    _joinDateController.clear();
+    _designationController.clear();
+    _profileImageController.clear();
+    _emergencyContactNameController.clear();
+    _emergencyContactNumberController.clear();
+    _emergencyContactRelationController.clear();
+    _passwordController.clear();
+    setState(() {
+      _selectedRole = 'Select Role';
+      _selectedSupervisor = 'Select Supervisor';
+      _selectedDOB = null;
+      _selectedJoinDate = null;
+      _selectedDesignationDate = null;
+      _pickedImage = null;
+    });
+  }
+
+  void _showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: message.toLowerCase().contains('error') ||
+              message.toLowerCase().contains('failed') ||
+              message.toLowerCase().contains('please')
+          ? Colors.red
+          : Colors.green,
+      textColor: Colors.white,
+      fontSize: 14.0,
+    );
   }
 
   @override
@@ -320,9 +425,11 @@ class _AddUserScreenState extends State<AddUserScreen> {
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
-                                value: _selectedSupervisor,
+                                value: _supervisor.contains(_selectedSupervisor)
+                                    ? _selectedSupervisor
+                                    : null,
                                 isExpanded: true,
-                                items: _supervisour.map((String supervisor) {
+                                items: _supervisor.map((String supervisor) {
                                   return DropdownMenuItem<String>(
                                     value: supervisor,
                                     child: Text(supervisor),
@@ -363,7 +470,9 @@ class _AddUserScreenState extends State<AddUserScreen> {
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
-                                value: _selectedRole,
+                                value: _roles.contains(_selectedRole)
+                                    ? _selectedRole
+                                    : null,
                                 isExpanded: true,
                                 items: _roles.map((String role) {
                                   return DropdownMenuItem<String>(

@@ -10,6 +10,7 @@ class UserModel {
   String? supervisorId;
   String profileImageUrl;
   Map<String, String> emergencyContact;
+  String password;
 
   UserModel({
     required this.firstName,
@@ -23,6 +24,7 @@ class UserModel {
     this.supervisorId,
     required this.profileImageUrl,
     required this.emergencyContact,
+    required this.password,
   });
 
   Map<String, dynamic> toMap() {
@@ -38,6 +40,7 @@ class UserModel {
       'supervisor_id': supervisorId ?? '',
       'profile_image_url': profileImageUrl,
       'emergency_contact': emergencyContact,
+      'password': password,
     };
   }
 }
