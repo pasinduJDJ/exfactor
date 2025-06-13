@@ -1,3 +1,4 @@
+import 'package:exfactor/utils/colors.dart';
 import 'package:flutter/material.dart';
 import '../../utils/constants.dart';
 
@@ -38,7 +39,7 @@ class CustomButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: isOutlined
-              ? Colors.transparent
+              ? kSecondaryColor
               : (backgroundColor ?? theme.primaryColor),
           foregroundColor:
               isOutlined ? theme.primaryColor : (textColor ?? Colors.white),

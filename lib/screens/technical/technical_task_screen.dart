@@ -1,3 +1,4 @@
+import 'package:exfactor/utils/colors.dart';
 import 'package:flutter/material.dart';
 import '../../utils/theme.dart';
 import '../../utils/constants.dart';
@@ -36,7 +37,7 @@ class TechnicalTaskScreen extends StatelessWidget {
     ];
 
     return Container(
-      color: AppTheme.bgColor,
+      color: kPrimaryColor,
       padding: const EdgeInsets.all(AppConstants.defaultPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,7 +50,7 @@ class TechnicalTaskScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.themeColor,
+                  color: kPrimaryColor,
                 ),
               ),
               CustomButton(

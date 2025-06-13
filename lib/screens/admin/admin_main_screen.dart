@@ -1,9 +1,9 @@
+import 'package:exfactor/screens/admin/admin_add_user.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/common/base_layout.dart';
 import 'admin_home.dart';
 import 'admin_task_screen.dart';
 import 'admin_notification_screen.dart';
-import 'admin_manage_screen.dart';
 
 class AdminMainScreen extends StatefulWidget {
   const AdminMainScreen({super.key});
@@ -19,7 +19,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
     const AdminHome(),
     const AdminTaskScreen(),
     const AdminNotificationScreen(),
-    const AdminManageScreen(),
+    const AddUserScreen(),
   ];
 
   final List<BottomNavigationBarItem> _navigationItems = const [
@@ -44,9 +44,9 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
   @override
   Widget build(BuildContext context) {
     return BaseLayout(
-      title: 'Admin Dashboard',
-      subtitle: 'Manage your organization',
-      profileImage: 'assets/images/avatar.png',
+      title: 'Chamuly D.',
+      subtitle: 'CEO & Founder',
+      profileImage: 'assets/images/man-avatar.jpg',
       onProfileTap: () {
         // TODO: Implement profile action
       },

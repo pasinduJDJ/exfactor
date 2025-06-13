@@ -1,3 +1,4 @@
+import 'package:exfactor/utils/colors.dart';
 import 'package:flutter/material.dart';
 import '../../utils/theme.dart';
 import '../../utils/constants.dart';
@@ -40,7 +41,7 @@ class AdminManageScreen extends StatelessWidget {
     ];
 
     return Container(
-      color: AppTheme.bgColor,
+      color: KbgColor,
       padding: const EdgeInsets.all(AppConstants.defaultPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -50,7 +51,7 @@ class AdminManageScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: AppTheme.themeColor,
+              color: kPrimaryColor,
             ),
           ),
           const SizedBox(height: AppConstants.defaultSpacing * 2),
@@ -76,7 +77,7 @@ class AdminManageScreen extends StatelessWidget {
                         Icon(
                           item['icon'] as IconData,
                           size: 32,
-                          color: AppTheme.themeColor,
+                          color: kPrimaryColor,
                         ),
                         const SizedBox(height: AppConstants.defaultSpacing),
                         Text(

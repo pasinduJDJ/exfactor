@@ -1,3 +1,4 @@
+import 'package:exfactor/utils/colors.dart';
 import 'package:flutter/material.dart';
 import '../../utils/theme.dart';
 import '../../widgets/common/custom_button.dart';
@@ -8,7 +9,7 @@ class AdminTaskScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppTheme.bgColor,
+      color: KbgColor,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -18,7 +19,7 @@ class AdminTaskScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.themeColor,
+                color:kPrimaryColor,
               ),
             ),
             const SizedBox(height: 20),

@@ -1,3 +1,4 @@
+import 'package:exfactor/utils/colors.dart';
 import 'package:flutter/material.dart';
 import '../../utils/theme.dart';
 import '../../utils/constants.dart';
@@ -24,7 +25,7 @@ class AdminNotificationScreen extends StatelessWidget {
     ];
 
     return Container(
-      color: AppTheme.bgColor,
+      color: KbgColor,
       child: ListView.builder(
         padding: const EdgeInsets.all(AppConstants.defaultPadding),
         itemCount: notifications.length,
@@ -36,7 +37,7 @@ class AdminNotificationScreen extends StatelessWidget {
               leading: CircleAvatar(
                 backgroundColor: notification['isRead'] as bool
                     ? Colors.grey[200]
-                    : AppTheme.themeColor,
+                    : kPrimaryColor,
                 child: Icon(
                   Icons.notifications,
                   color: notification['isRead'] as bool

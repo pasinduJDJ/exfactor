@@ -13,7 +13,7 @@ class BaseLayout extends StatelessWidget {
   final List<BottomNavigationBarItem> navigationItems;
   final PreferredSizeWidget? customAppBar;
 
-  const BaseLayout({
+  BaseLayout({
     Key? key,
     required this.title,
     required this.subtitle,
@@ -31,11 +31,15 @@ class BaseLayout extends StatelessWidget {
     return Scaffold(
       appBar: customAppBar ??
           PreferredSize(
-            preferredSize: const Size.fromHeight(90),
+            preferredSize: const Size.fromHeight(120),
             child: Container(
-              padding: const EdgeInsets.all(AppConstants.defaultPadding),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               decoration: const BoxDecoration(
                 color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black12,
@@ -47,6 +51,41 @@ class BaseLayout extends StatelessWidget {
               child: SafeArea(
                 child: Row(
                   children: [
+                    // GestureDetector(
+                    //   onTap: onProfileTap,
+                    //   child: CircleAvatar(
+                    //     radius: 24,
+                    //     backgroundImage: profileImage != null
+                    //         ? AssetImage(profileImage!)
+                    //         : const AssetImage('assets/images/man-avatar.jpg'),
+                    //   ),
+                    // ),
+                    // const SizedBox(width: 16),
+                    // Expanded(
+                    //   child: Column(
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     mainAxisAlignment: MainAxisAlignment.center,
+                    //     children: [
+                    //       Text(
+                    //         title,
+                    //         style: const TextStyle(
+                    //           fontSize: 20,
+                    //           fontWeight: FontWeight.bold,
+                    //           color: Colors.black,
+                    //         ),
+                    //       ),
+                    //       const SizedBox(height: 4),
+                    //       Text(
+                    //         subtitle,
+                    //         style: TextStyle(
+                    //           fontSize: 14,
+                    //           color: Colors.grey[600],
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,7 +96,7 @@ class BaseLayout extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: AppTheme.themeColor,
+                              color: Colors.black,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -88,9 +127,9 @@ class BaseLayout extends StatelessWidget {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: onIndexChanged,
-        selectedItemColor: const Color.fromARGB(255, 112, 7, 7),
+        selectedItemColor: Color.fromARGB(255, 255, 255, 255),
         unselectedItemColor: Colors.white60,
-        backgroundColor: Color.fromARGB(0, 5, 177, 22),
+        backgroundColor: Color(0xFF002055),
         type: BottomNavigationBarType.fixed,
         showSelectedLabels: false,
         showUnselectedLabels: false,

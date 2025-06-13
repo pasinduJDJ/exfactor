@@ -1,3 +1,4 @@
+import 'package:exfactor/utils/colors.dart';
 import 'package:flutter/material.dart';
 import '../../utils/theme.dart';
 import '../../utils/constants.dart';
@@ -9,7 +10,7 @@ class SupervisorProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppTheme.bgColor,
+      color: KbgColor,
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppConstants.defaultPadding),
         child: Column(
@@ -26,7 +27,7 @@ class SupervisorProfileScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.themeColor,
+                color: kPrimaryColor,
               ),
             ),
             const Text(

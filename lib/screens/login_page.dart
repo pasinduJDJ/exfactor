@@ -2,6 +2,7 @@ import 'package:exfactor/screens/admin/admin_home.dart';
 import 'package:exfactor/screens/admin/admin_main_screen.dart';
 import 'package:exfactor/screens/supervisor/supervisor_main_screen.dart';
 import 'package:exfactor/screens/technical/technical_main_screen.dart';
+import 'package:exfactor/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:exfactor/utils/theme.dart';
@@ -161,7 +162,7 @@ void _showToast(String message) {
     msg: message,
     toastLength: Toast.LENGTH_SHORT,
     gravity: ToastGravity.BOTTOM,
-    backgroundColor: AppTheme.errColor,
+    backgroundColor: Colors.red,
     textColor: Colors.white,
     fontSize: 14.0,
   );
