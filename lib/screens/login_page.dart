@@ -1,11 +1,8 @@
-import 'package:exfactor/screens/admin/admin_home.dart';
 import 'package:exfactor/screens/admin/admin_main_screen.dart';
 import 'package:exfactor/screens/supervisor/supervisor_main_screen.dart';
 import 'package:exfactor/screens/technical/technical_main_screen.dart';
-import 'package:exfactor/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:exfactor/utils/theme.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

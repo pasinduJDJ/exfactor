@@ -1,6 +1,5 @@
 import 'package:exfactor/utils/colors.dart';
 import 'package:flutter/material.dart';
-import '../../utils/theme.dart';
 import '../../utils/constants.dart';
 import '../../widgets/common/custom_button.dart';
 
@@ -14,25 +13,25 @@ class AdminHome extends StatelessWidget {
         'title': 'Active Tasks',
         'value': '12',
         'icon': Icons.task,
-        'color': Colors.blue,
+        'color': cardGreen,
       },
-      {
-        'title': 'Team Members',
-        'value': '24',
-        'icon': Icons.people,
-        'color': Colors.green,
-      },
+      // {
+      //   'title': 'Team Members',
+      //   'value': '24',
+      //   'icon': Icons.people,
+      //   'color': cardGreen,
+      // },
       {
         'title': 'Pending Tasks',
         'value': '5',
         'icon': Icons.pending_actions,
-        'color': Colors.orange,
+        'color': cardYellow,
       },
       {
         'title': 'Completed',
         'value': '45',
         'icon': Icons.check_circle,
-        'color': Colors.purple,
+        'color': cardLightBlue,
       },
     ];
 

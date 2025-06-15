@@ -1,6 +1,5 @@
 import 'package:exfactor/utils/colors.dart';
 import 'package:flutter/material.dart';
-import '../../utils/theme.dart';
 import '../../utils/constants.dart';
 
 class AdminNotificationScreen extends StatelessWidget {

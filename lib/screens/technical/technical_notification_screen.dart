@@ -1,8 +1,6 @@
 import 'package:exfactor/utils/colors.dart';
 import 'package:flutter/material.dart';
-import '../../utils/theme.dart';
 import '../../utils/constants.dart';
-import '../../widgets/common/custom_button.dart';
 
 class TechnicalReportScreen extends StatelessWidget {
   const TechnicalReportScreen({Key? key}) : super(key: key);
@@ -11,22 +9,20 @@ class TechnicalReportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final reports = [
       {
-        'title': 'Network Maintenance Report',
-        'date': '2024-03-19',
-        'status': 'Submitted',
-        'type': 'Maintenance',
+        'title': 'System Down',
+        'message': 'Network maintenance scheduled for March 20, 2024.',
+        'type': 'notice',
       },
       {
-        'title': 'Server Backup Report',
-        'date': '2024-03-18',
-        'status': 'Draft',
-        'type': 'Backup',
+        'title': 'Chrisms Party',
+        'message':
+            ' Join us for the annual Christmas party on December 25, 2024.',
+        'type': 'event',
       },
       {
-        'title': 'Security Audit Report',
-        'date': '2024-03-17',
-        'status': 'Approved',
-        'type': 'Audit',
+        'title': 'Happy Birthday',
+        'message': 'To day is John\'s birthday. Wish him a great day!',
+        'type': 'birthday',
       },
     ];
 
@@ -36,25 +32,6 @@ class TechnicalReportScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Reports',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: kPrimaryColor,
-                ),
-              ),
-              CustomButton(
-                text: 'New Report',
-                onPressed: () {
-                  // TODO: Navigate to create report screen
-                },
-              ),
-            ],
-          ),
           const SizedBox(height: AppConstants.defaultSpacing * 2),
           Expanded(
             child: ListView.builder(
@@ -86,36 +63,16 @@ class TechnicalReportScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: AppConstants.defaultSpacing / 2),
-                        Text('Date: ${report['date']}'),
+                        Text('${report['message']}'),
                         const SizedBox(height: AppConstants.defaultSpacing / 2),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
                             vertical: 4,
                           ),
-                          decoration: BoxDecoration(
-                            color: _getStatusColor(report['status'] as String),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            report['status'] as String,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          ),
                         ),
                       ],
                     ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.more_vert),
-                      onPressed: () {
-                        // TODO: Show report actions
-                      },
-                    ),
-                    onTap: () {
-                      // TODO: Navigate to report details
-                    },
                   ),
                 );
               },
@@ -126,27 +83,14 @@ class TechnicalReportScreen extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'approved':
-        return Colors.green;
-      case 'submitted':
-        return Colors.blue;
-      case 'draft':
-        return Colors.orange;
-      default:
-        return Colors.grey;
-    }
-  }
-
   Color _getTypeColor(String type) {
     switch (type.toLowerCase()) {
-      case 'maintenance':
-        return Colors.blue;
-      case 'backup':
-        return Colors.purple;
-      case 'audit':
-        return Colors.teal;
+      case 'event':
+        return const Color.fromARGB(255, 226, 203, 1);
+      case 'notice':
+        return const Color.fromARGB(255, 19, 0, 191);
+      case 'birthday':
+        return const Color.fromARGB(255, 174, 1, 18);
       default:
         return Colors.grey;
     }
@@ -154,12 +98,12 @@ class TechnicalReportScreen extends StatelessWidget {
 
   IconData _getTypeIcon(String type) {
     switch (type.toLowerCase()) {
-      case 'maintenance':
-        return Icons.build;
-      case 'backup':
-        return Icons.backup;
-      case 'audit':
-        return Icons.security;
+      case 'event':
+        return Icons.calendar_month;
+      case 'notice':
+        return Icons.info_rounded;
+      case 'birthday':
+        return Icons.cake;
       default:
         return Icons.description;
     }

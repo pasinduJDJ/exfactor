@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../utils/constants.dart';
-import '../../utils/theme.dart';
 
 class BaseLayout extends StatelessWidget {
   final String title;
@@ -51,41 +49,6 @@ class BaseLayout extends StatelessWidget {
               child: SafeArea(
                 child: Row(
                   children: [
-                    // GestureDetector(
-                    //   onTap: onProfileTap,
-                    //   child: CircleAvatar(
-                    //     radius: 24,
-                    //     backgroundImage: profileImage != null
-                    //         ? AssetImage(profileImage!)
-                    //         : const AssetImage('assets/images/man-avatar.jpg'),
-                    //   ),
-                    // ),
-                    // const SizedBox(width: 16),
-                    // Expanded(
-                    //   child: Column(
-                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                    //     mainAxisAlignment: MainAxisAlignment.center,
-                    //     children: [
-                    //       Text(
-                    //         title,
-                    //         style: const TextStyle(
-                    //           fontSize: 20,
-                    //           fontWeight: FontWeight.bold,
-                    //           color: Colors.black,
-                    //         ),
-                    //       ),
-                    //       const SizedBox(height: 4),
-                    //       Text(
-                    //         subtitle,
-                    //         style: TextStyle(
-                    //           fontSize: 14,
-                    //           color: Colors.grey[600],
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,6 +1,5 @@
 import 'package:exfactor/utils/colors.dart';
 import 'package:flutter/material.dart';
-import '../../utils/theme.dart';
 import '../../widgets/common/custom_button.dart';
 
 class AdminTaskScreen extends StatelessWidget {
