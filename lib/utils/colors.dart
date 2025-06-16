@@ -11,3 +11,4 @@ const Color cardLightBlue = Color(0xff0077FF);
 const Color cardGreen = Color(0xff3E8914);
 const Color cardRed = Color(0xffC2131F);
 const Color cardYellow = Color(0xffEDBD59);
+const Color cardOrenge = Color(0xffF77F00);

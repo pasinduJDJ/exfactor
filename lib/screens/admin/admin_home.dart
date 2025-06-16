@@ -1,107 +1,80 @@
-import 'package:exfactor/utils/colors.dart';
-import 'package:flutter/material.dart';
-import '../../utils/constants.dart';
-import '../../widgets/common/custom_button.dart';
+import 'dart:ui';
 
-class AdminHome extends StatelessWidget {
-  const AdminHome({Key? key}) : super(key: key);
+import 'package:exfactor/models/task_model.dart';
+import 'package:exfactor/utils/colors.dart';
+import 'package:exfactor/widgets/common/custom_button.dart';
+import 'package:exfactor/widgets/utils_widget.dart';
+import 'package:flutter/material.dart';
+
+class AdminHome extends StatefulWidget {
+  const AdminHome({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final statistics = [
-      {
-        'title': 'Active Tasks',
-        'value': '12',
-        'icon': Icons.task,
-        'color': cardGreen,
-      },
-      // {
-      //   'title': 'Team Members',
-      //   'value': '24',
-      //   'icon': Icons.people,
-      //   'color': cardGreen,
-      // },
-      {
-        'title': 'Pending Tasks',
-        'value': '5',
-        'icon': Icons.pending_actions,
-        'color': cardYellow,
-      },
-      {
-        'title': 'Completed',
-        'value': '45',
-        'icon': Icons.check_circle,
-        'color': cardLightBlue,
-      },
-    ];
+  State<AdminHome> createState() => _AdminHomeState();
+}
 
-    return Container(
-      color: KbgColor,
-      padding: const EdgeInsets.all(AppConstants.defaultPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Dashboard Overview',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: AppConstants.defaultSpacing * 2),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: AppConstants.defaultSpacing,
-              mainAxisSpacing: AppConstants.defaultSpacing,
-              childAspectRatio: 1.5,
-            ),
-            itemCount: statistics.length,
-            itemBuilder: (context, index) {
-              final stat = statistics[index];
-              return Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.defaultPadding),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        stat['icon'] as IconData,
-                        color: stat['color'] as Color,
-                        size: 32,
-                      ),
-                      const SizedBox(height: AppConstants.defaultSpacing),
-                      Text(
-                        stat['value'] as String,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        stat['title'] as String,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: AppConstants.defaultSpacing * 2),
-          CustomButton(
-            text: 'Create New Task',
-            onPressed: () {
-              // TODO: Navigate to task creation
-            },
-          ),
-        ],
-      ),
+class _AdminHomeState extends State<AdminHome> {
+  bool showPending = false;
+  bool showProgress = true;
+  bool showOverdue = false;
+  bool showComplete = false;
+
+  // Example fetched tasks
+  final List<Task> tasks = [
+    Task(title: 'Database Migration', status: 'progress'),
+    Task(title: 'Task 2', status: 'progress'),
+    Task(title: 'Overdue Report', status: 'overdue'),
+    Task(title: 'Pending Review', status: 'pending'),
+    Task(title: 'Completed Feature', status: 'complete'),
+  ];
+  @override
+  Widget build(BuildContext context) {
+    List<Map<String, dynamic>> statusItems = [
+      {'label': 'Live Project', 'count': 2, 'color': const Color(0xFF25253F)},
+      {'label': 'OVER DUE', 'count': 0, 'color': Colors.red},
+      {'label': 'PENDING', 'count': 5, 'color': Colors.amber},
+      {'label': 'ON PROGRESS', 'count': 15, 'color': Colors.green},
+    ];
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Column(children: [
+        const SizedBox(height: 30),
+        //Summary card
+        UserUtils.buildStatusSummaryCard(statusItems),
+        const SizedBox(height: 30),
+        // Btn
+        CustomButton(
+          text: "Add New Project",
+          onPressed: () {},
+          backgroundColor: kPrimaryColor,
+          width: double.infinity,
+          height: 48,
+          icon: Icon(Icons.assignment_turned_in_outlined),
+        ),
+        const SizedBox(height: 30),
+        //Static wight Group
+        UserUtils.buildGroup(
+          'On Progress',
+          cardLightBlue,
+          tasks.where((t) => t.status == 'overdue').toList(),
+        ),
+        const SizedBox(height: 30),
+        //label 
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Exfactor Team Members",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))
+          ],
+        ),
+        const SizedBox(height: 10),
+        // static Wight Group
+        UserUtils.buildGroup(
+          'On Progress Task',
+          cardOrenge,
+          tasks.where((t) => t.status == 'progress').toList(),
+        ),
+      ]),
     );
   }
 }

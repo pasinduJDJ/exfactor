@@ -5,6 +5,7 @@ import '../../utils/constants.dart';
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
+  final Icon? icon;
   final bool isLoading;
   final bool isOutlined;
   final Color? backgroundColor;
@@ -26,6 +27,7 @@ class CustomButton extends StatelessWidget {
     this.height,
     this.padding,
     this.borderRadius,
+    this.icon,
   }) : super(key: key);
 
   @override
@@ -39,7 +41,7 @@ class CustomButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: isOutlined
-              ? kSecondaryColor
+              ? kPrimaryColor
               : (backgroundColor ?? theme.primaryColor),
           foregroundColor:
               isOutlined ? theme.primaryColor : (textColor ?? Colors.white),
@@ -57,19 +59,28 @@ class CustomButton extends StatelessWidget {
         child: isLoading
             ? const SizedBox(
                 height: 48,
-                width: double.infinity,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : Text(
-                text,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: isOutlined
-                      ? theme.primaryColor
-                      : (textColor ?? Colors.white),
-                ),
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null) ...[
+                    icon!,
+                    const SizedBox(width: 8),
+                  ],
+                  Text(
+                    text,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: isOutlined
+                          ? theme.primaryColor
+                          : (textColor ?? Colors.white),
+                    ),
+                  ),
+                ],
               ),
       ),
     );

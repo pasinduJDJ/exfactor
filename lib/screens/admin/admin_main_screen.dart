@@ -1,9 +1,10 @@
-import 'package:exfactor/screens/admin/admin_add_user.dart';
+import 'package:exfactor/screens/admin/admin_manage_users.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/common/base_layout.dart';
 import 'admin_home.dart';
 import 'admin_task_screen.dart';
 import 'admin_notification_screen.dart';
+import 'package:exfactor/widgets/common/custom_app_bar_with_icon.dart';
 
 class AdminMainScreen extends StatefulWidget {
   const AdminMainScreen({super.key});
@@ -19,7 +20,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
     const AdminHome(),
     const AdminTaskScreen(),
     const AdminNotificationScreen(),
-    const AddUserScreen(),
+    const MangeUsers(),
   ];
 
   final List<BottomNavigationBarItem> _navigationItems = const [
@@ -41,19 +42,34 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
     ),
   ];
 
+  PreferredSizeWidget? _getCustomAppBar() {
+    switch (_currentIndex) {
+      case 1:
+        return const CustomAppBarWithIcon(
+            title: 'Manage Projects', icon: Icons.list_alt);
+      case 2:
+        return const CustomAppBarWithIcon(
+            title: 'Manage Notifications', icon: Icons.notifications_active);
+      case 3:
+        return const CustomAppBarWithIcon(
+            title: 'Manage Users', icon: Icons.account_circle);
+      default:
+        return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BaseLayout(
       title: 'Chamuly D.',
       subtitle: 'CEO & Founder',
       profileImage: 'assets/images/man-avatar.jpg',
-      onProfileTap: () {
-        // TODO: Implement profile action
-      },
+      onProfileTap: () {},
       body: _screens[_currentIndex],
       currentIndex: _currentIndex,
       onIndexChanged: (index) => setState(() => _currentIndex = index),
       navigationItems: _navigationItems,
+      customAppBar: _getCustomAppBar(),
     );
   }
 }

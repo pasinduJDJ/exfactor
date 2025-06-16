@@ -7,7 +7,7 @@ class TechnicalReportScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reports = [
+    final notification = [
       {
         'title': 'System Down',
         'message': 'Network maintenance scheduled for March 20, 2024.',
@@ -35,9 +35,9 @@ class TechnicalReportScreen extends StatelessWidget {
           const SizedBox(height: AppConstants.defaultSpacing * 2),
           Expanded(
             child: ListView.builder(
-              itemCount: reports.length,
+              itemCount: notification.length,
               itemBuilder: (context, index) {
-                final report = reports[index];
+                final report = notification[index];
                 return Card(
                   margin: const EdgeInsets.only(
                     bottom: AppConstants.defaultSpacing,

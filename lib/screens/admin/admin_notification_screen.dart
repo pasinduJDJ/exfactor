@@ -1,4 +1,6 @@
 import 'package:exfactor/utils/colors.dart';
+import 'package:exfactor/widgets/common/custom_button.dart';
+import 'package:exfactor/widgets/notification_card_view.dart';
 import 'package:flutter/material.dart';
 import '../../utils/constants.dart';
 
@@ -10,66 +12,62 @@ class AdminNotificationScreen extends StatelessWidget {
     // Dummy notifications data
     final notifications = [
       {
-        'title': 'New Task Assigned',
-        'message': 'A new task has been assigned to Team A',
-        'time': '2 hours ago',
-        'isRead': false,
+        'title': 'Server Upgrade',
+        'subtitle': 'Will be offline from 2–4 AM',
+        'type': 'Event',
+        'submission_date': '2025-06-16',
       },
       {
-        'title': 'Task Completed',
-        'message': 'Team B has completed their assigned task',
-        'time': '5 hours ago',
-        'isRead': true,
+        'title': 'Harindu’s Birthday',
+        'subtitle': 'Wish Harindu a happy birthday today!',
+        'type': 'Birthday',
+        'submission_date': '2025-06-16',
+      },
+      {
+        'title': 'Weekly Newsletter',
+        'subtitle': 'Your digest for the week is ready',
+        'type': 'News',
+        'submission_date': '2025-06-15',
       },
     ];
 
-    return Container(
-      color: KbgColor,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(AppConstants.defaultPadding),
-        itemCount: notifications.length,
-        itemBuilder: (context, index) {
-          final notification = notifications[index];
-          return Card(
-            margin: const EdgeInsets.only(bottom: AppConstants.defaultSpacing),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: notification['isRead'] as bool
-                    ? Colors.grey[200]
-                    : kPrimaryColor,
-                child: Icon(
-                  Icons.notifications,
-                  color: notification['isRead'] as bool
-                      ? Colors.grey
-                      : Colors.white,
-                ),
-              ),
-              title: Text(
-                notification['title'] as String,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(notification['message'] as String),
-                  const SizedBox(height: 4),
-                  Text(
-                    notification['time'] as String,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-              onTap: () {
-                // TODO: Handle notification tap
-              },
-            ),
-          );
-        },
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: [
+          const SizedBox(
+            height: 30,
+          ),
+          CustomButton(
+            text: "Add Alert",
+            width: double.infinity,
+            backgroundColor: kPrimaryColor,
+            onPressed: () {
+              // Navigator.pushReplacement(
+              //   context,
+              //   MaterialPageRoute(builder: (_) => const AddUserScreen()),
+              // );
+            },
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          const Row(
+            children: [
+              Text(
+                "NOIFICATION ",
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1),
+              )
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          NotificationCard.buildNotificationCards(notifications)
+        ],
       ),
     );
   }

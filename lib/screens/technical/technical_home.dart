@@ -1,6 +1,6 @@
 import 'package:exfactor/models/task_model.dart';
 import 'package:exfactor/utils/colors.dart';
-import 'package:exfactor/widgets/technical_user_utils.dart';
+import 'package:exfactor/widgets/utils_widget.dart';
 import 'package:flutter/material.dart';
 
 class TechnicalHome extends StatefulWidget {
@@ -26,57 +26,39 @@ class _TechnicalHomeState extends State<TechnicalHome> {
   ];
   @override
   Widget build(BuildContext context) {
-    final taskCounts = {
-      'pending': tasks.where((t) => t.status == 'pending').length,
-      'progress': tasks.where((t) => t.status == 'progress').length,
-      'complete': tasks.where((t) => t.status == 'complete').length,
-    };
+    List<Map<String, dynamic>> statusItems = [
+      {'label': 'OVER DUE', 'count': 0, 'color': cardRed},
+      {'label': 'PENDING', 'count': 5, 'color': cardYellow},
+      {'label': 'ON PROGRESS', 'count': 15, 'color': cardGreen},
+      {'label': 'Complete', 'count': 2, 'color': cardLightBlue},
+    ];
     return SingleChildScrollView(
       child: Column(children: [
         SizedBox(height: 20),
-        Card(
-          elevation: 6,
-          shadowColor: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.5),
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                TechnicalUserUtils.buildStatusCard(
-                    'PENDING', cardRed, taskCounts['pending'] ?? 0),
-                TechnicalUserUtils.buildStatusCard(
-                    'ON PROGRESS', cardGreen, taskCounts['progress'] ?? 0),
-                TechnicalUserUtils.buildStatusCard(
-                    'COMPLETE', cardLightBlue, taskCounts['complete'] ?? 0),
-              ],
-            ),
-          ),
-        ),
+        UserUtils.buildStatusSummaryCard(statusItems),
         const SizedBox(height: 30),
-        TechnicalUserUtils.buildExpandableGroup(
+        UserUtils.buildExpandableGroup(
           'On Progress Task',
           cardGreen,
           showProgress,
           () => setState(() => showProgress = !showProgress),
           tasks.where((t) => t.status == 'progress').toList(),
         ),
-        TechnicalUserUtils.buildExpandableGroup(
+        UserUtils.buildExpandableGroup(
           'Pending Task',
           cardYellow,
           showPending,
           () => setState(() => showPending = !showPending),
           tasks.where((t) => t.status == 'pending').toList(),
         ),
-        TechnicalUserUtils.buildExpandableGroup(
+        UserUtils.buildExpandableGroup(
           'Over Due Task',
           cardRed,
           showOverdue,
           () => setState(() => showOverdue = !showOverdue),
           tasks.where((t) => t.status == 'overdue').toList(),
         ),
-        TechnicalUserUtils.buildExpandableGroup(
+        UserUtils.buildExpandableGroup(
           'Completed Task',
           cardLightBlue,
           showComplete,
