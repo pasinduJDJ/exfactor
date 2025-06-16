@@ -62,8 +62,13 @@ class UserUtils {
   }
 
   // Expandeble Group Widget
-  static Widget buildExpandableGroup(String title, Color color, bool expanded,
-      VoidCallback onToggle, List<Task> groupTasks) {
+  static Widget buildExpandableGroup(
+      String title,
+      Color color,
+      bool expanded,
+      VoidCallback onToggle,
+      List<Task> groupTasks,
+      ValueChanged<Task> onSeeMore) {
     return Card(
       elevation: 3,
       child: Column(
@@ -105,7 +110,7 @@ class UserUtils {
                 return ListTile(
                   title: Text(task.title),
                   trailing: TextButton(
-                    onPressed: () {},
+                    onPressed: () => onSeeMore(task),
                     child: const Text("See more.."),
                   ),
                 );
@@ -120,7 +125,8 @@ class UserUtils {
   }
 
   //Static Group weight
-  static Widget buildGroup(String title, Color color, List<Task> groupTasks) {
+  static Widget buildGroup(String title, Color color, List<Task> groupTasks,
+      ValueChanged<Task> onSeeMore) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -159,7 +165,7 @@ class UserUtils {
               return ListTile(
                 title: Text(task.title),
                 trailing: TextButton(
-                  onPressed: () {},
+                  onPressed: () => onSeeMore(task),
                   child: const Text("See more.."),
                 ),
               );

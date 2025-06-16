@@ -46,10 +46,10 @@ class _MangeUsersState extends State<MangeUsers> {
             width: double.infinity,
             backgroundColor: kPrimaryColor,
             onPressed: () {
-              // Navigator.pushReplacement(
-              //   context,
-              //   MaterialPageRoute(builder: (_) => const AddUserScreen()),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddUserScreen()),
+              );
             },
           ),
           const SizedBox(
@@ -59,7 +59,10 @@ class _MangeUsersState extends State<MangeUsers> {
             children: [
               Text(
                 "Exfactor Team",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,letterSpacing: 1),
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1),
               ),
             ],
           ),

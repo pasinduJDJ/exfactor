@@ -1,10 +1,10 @@
-import 'dart:ui';
-
 import 'package:exfactor/models/task_model.dart';
 import 'package:exfactor/utils/colors.dart';
 import 'package:exfactor/widgets/common/custom_button.dart';
 import 'package:exfactor/widgets/utils_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:exfactor/screens/admin/admin_single_project_screen.dart';
+import 'package:exfactor/screens/admin/admin_single_task_screen.dart';
 
 class AdminHome extends StatefulWidget {
   const AdminHome({super.key});
@@ -19,7 +19,6 @@ class _AdminHomeState extends State<AdminHome> {
   bool showOverdue = false;
   bool showComplete = false;
 
-  // Example fetched tasks
   final List<Task> tasks = [
     Task(title: 'Database Migration', status: 'progress'),
     Task(title: 'Task 2', status: 'progress'),
@@ -39,10 +38,8 @@ class _AdminHomeState extends State<AdminHome> {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(children: [
         const SizedBox(height: 30),
-        //Summary card
         UserUtils.buildStatusSummaryCard(statusItems),
         const SizedBox(height: 30),
-        // Btn
         CustomButton(
           text: "Manage Projects",
           onPressed: () {},
@@ -52,14 +49,18 @@ class _AdminHomeState extends State<AdminHome> {
           icon: Icon(Icons.assignment_turned_in_outlined),
         ),
         const SizedBox(height: 30),
-        //Static wight Group
         UserUtils.buildGroup(
           'On Progress',
           cardLightBlue,
           tasks.where((t) => t.status == 'overdue').toList(),
+          (task) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => AdminSingleProjectScreen()),
+            );
+          },
         ),
         const SizedBox(height: 30),
-        //label
         const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -68,11 +69,16 @@ class _AdminHomeState extends State<AdminHome> {
           ],
         ),
         const SizedBox(height: 10),
-        // static Wight Group
         UserUtils.buildGroup(
           'On Progress Task',
           cardOrenge,
           tasks.where((t) => t.status == 'progress').toList(),
+          (task) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => AdminSingleTaskScreen()),
+            );
+          },
         ),
       ]),
     );

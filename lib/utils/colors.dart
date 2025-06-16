@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 const Color kPrimaryColor = Color(0xff002055);
-const Color kSecondaryColor = Color(0xff002055);
+const Color kSecondaryColor = Color(0xff656565);
 const Color KbgColor = Color.fromARGB(255, 214, 222, 225);
 const Color KtextColor = Colors.black;
 const Color kblack = Color(0xff000000);
@@ -12,3 +12,7 @@ const Color cardGreen = Color(0xff3E8914);
 const Color cardRed = Color(0xffC2131F);
 const Color cardYellow = Color(0xffEDBD59);
 const Color cardOrenge = Color(0xffF77F00);
+
+const Color cardDarkRed = Color(0xff7D0A12);
+const Color cardDarkYellow = Color(0xffEDBD59);
+const Color cardDarkGreen = Color(0xff2F5F15);

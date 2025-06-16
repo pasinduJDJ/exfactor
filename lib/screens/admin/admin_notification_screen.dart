@@ -2,15 +2,13 @@ import 'package:exfactor/utils/colors.dart';
 import 'package:exfactor/widgets/common/custom_button.dart';
 import 'package:exfactor/widgets/notification_card_view.dart';
 import 'package:flutter/material.dart';
-import '../../utils/constants.dart';
 
 class AdminNotificationScreen extends StatelessWidget {
   const AdminNotificationScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Dummy notifications data
-    final notifications = [
+    final List<Map<String, dynamic>> notifications = [
       {
         'title': 'Server Upgrade',
         'subtitle': 'Will be offline from 2–4 AM',
@@ -18,7 +16,7 @@ class AdminNotificationScreen extends StatelessWidget {
         'submission_date': '2025-06-16',
       },
       {
-        'title': 'Harindu’s Birthday',
+        'title': "Harindu's Birthday",
         'subtitle': 'Wish Harindu a happy birthday today!',
         'type': 'Birthday',
         'submission_date': '2025-06-16',
@@ -43,10 +41,7 @@ class AdminNotificationScreen extends StatelessWidget {
             width: double.infinity,
             backgroundColor: kPrimaryColor,
             onPressed: () {
-              // Navigator.pushReplacement(
-              //   context,
-              //   MaterialPageRoute(builder: (_) => const AddUserScreen()),
-              // );
+              // TODO: Implement add alert navigation
             },
           ),
           const SizedBox(

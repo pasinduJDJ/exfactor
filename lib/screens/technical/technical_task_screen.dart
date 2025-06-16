@@ -44,6 +44,7 @@ class _TaskTrackingBodyState extends State<TaskTrackingBody> {
           showProgress,
           () => setState(() => showProgress = !showProgress),
           tasks.where((t) => t.status == 'progress').toList(),
+          (task) => {},
         ),
         UserUtils.buildExpandableGroup(
           'Pending Task',
@@ -51,6 +52,7 @@ class _TaskTrackingBodyState extends State<TaskTrackingBody> {
           showPending,
           () => setState(() => showPending = !showPending),
           tasks.where((t) => t.status == 'pending').toList(),
+          (task) => {},
         ),
         UserUtils.buildExpandableGroup(
           'Over Due Task',
@@ -58,6 +60,7 @@ class _TaskTrackingBodyState extends State<TaskTrackingBody> {
           showOverdue,
           () => setState(() => showOverdue = !showOverdue),
           tasks.where((t) => t.status == 'overdue').toList(),
+          (task) => {},
         ),
         UserUtils.buildExpandableGroup(
           'Completed Task',
@@ -65,6 +68,7 @@ class _TaskTrackingBodyState extends State<TaskTrackingBody> {
           showComplete,
           () => setState(() => showComplete = !showComplete),
           tasks.where((t) => t.status == 'complete').toList(),
+          (task) => {},
         ),
       ]),
     );

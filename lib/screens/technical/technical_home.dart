@@ -43,6 +43,7 @@ class _TechnicalHomeState extends State<TechnicalHome> {
           showProgress,
           () => setState(() => showProgress = !showProgress),
           tasks.where((t) => t.status == 'progress').toList(),
+          (task) => {},
         ),
         UserUtils.buildExpandableGroup(
           'Pending Task',
@@ -50,6 +51,7 @@ class _TechnicalHomeState extends State<TechnicalHome> {
           showPending,
           () => setState(() => showPending = !showPending),
           tasks.where((t) => t.status == 'pending').toList(),
+          (task) => {},
         ),
         UserUtils.buildExpandableGroup(
           'Over Due Task',
@@ -57,6 +59,7 @@ class _TechnicalHomeState extends State<TechnicalHome> {
           showOverdue,
           () => setState(() => showOverdue = !showOverdue),
           tasks.where((t) => t.status == 'overdue').toList(),
+          (task) => {},
         ),
         UserUtils.buildExpandableGroup(
           'Completed Task',
@@ -64,6 +67,7 @@ class _TechnicalHomeState extends State<TechnicalHome> {
           showComplete,
           () => setState(() => showComplete = !showComplete),
           tasks.where((t) => t.status == 'complete').toList(),
+          (task) => {},
         ),
       ]),
     );
