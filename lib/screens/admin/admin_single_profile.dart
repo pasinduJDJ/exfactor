@@ -1,8 +1,11 @@
+import 'package:exfactor/widgets/common/custom_app_bar_with_icon.dart';
 import 'package:flutter/material.dart';
 import '../../utils/colors.dart';
 
 class AdminSingleProfileScreen extends StatelessWidget {
-  const AdminSingleProfileScreen({Key? key}) : super(key: key);
+  final Map<String, String> user;
+  const AdminSingleProfileScreen({Key? key, required this.user})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,20 +26,22 @@ class AdminSingleProfileScreen extends StatelessWidget {
     };
     return Scaffold(
       backgroundColor: KbgColor,
-      appBar: AppBar(
-        title: const Text('User Profile',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: kPrimaryColor,
-        foregroundColor: kWhite,
-        elevation: 1,
-        iconTheme: const IconThemeData(color: kWhite),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.groups),
-            onPressed: () {},
-          ),
-        ],
-      ),
+      // appBar: AppBar(
+      //   title: Text(user['name']!,
+      //       style: const TextStyle(fontWeight: FontWeight.bold)),
+      //   backgroundColor: kPrimaryColor,
+      //   foregroundColor: kWhite,
+      //   elevation: 1,
+      //   iconTheme: const IconThemeData(color: kWhite),
+      //   actions: [
+      //     IconButton(
+      //       icon: const Icon(Icons.groups),
+      //       onPressed: () {},
+      //     ),
+      //   ],
+      // ),
+      appBar:
+          CustomAppBarWithIcon(icon: Icons.person, title: "Pasindu Dulanajana"),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -80,7 +85,7 @@ class AdminSingleProfileScreen extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: cardDarkRed,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8)),

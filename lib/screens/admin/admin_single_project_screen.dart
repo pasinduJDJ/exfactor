@@ -1,3 +1,4 @@
+import 'package:exfactor/widgets/common/custom_app_bar_with_icon.dart';
 import 'package:flutter/material.dart';
 import '../../utils/colors.dart';
 
@@ -29,14 +30,7 @@ class AdminSingleProjectScreen extends StatelessWidget {
     };
     return Scaffold(
       backgroundColor: KbgColor,
-      appBar: AppBar(
-        title: const Text('Single Projects',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: kPrimaryColor,
-        foregroundColor: kWhite,
-        elevation: 1,
-        iconTheme: const IconThemeData(color: kWhite),
-      ),
+      appBar: CustomAppBarWithIcon(icon: Icons.task, title: "Project Details"),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

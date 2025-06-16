@@ -1,3 +1,4 @@
+import 'package:exfactor/screens/admin/admin_add_notification.dart';
 import 'package:exfactor/utils/colors.dart';
 import 'package:exfactor/widgets/common/custom_button.dart';
 import 'package:exfactor/widgets/notification_card_view.dart';
@@ -41,7 +42,11 @@ class AdminNotificationScreen extends StatelessWidget {
             width: double.infinity,
             backgroundColor: kPrimaryColor,
             onPressed: () {
-              // TODO: Implement add alert navigation
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AdminAddNotificationScreen()),
+              );
             },
           ),
           const SizedBox(

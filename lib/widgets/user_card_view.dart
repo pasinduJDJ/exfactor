@@ -1,3 +1,4 @@
+import 'package:exfactor/screens/admin/admin_single_profile.dart';
 import 'package:flutter/material.dart';
 
 class User_card {
@@ -22,7 +23,7 @@ class User_card {
             ),
             elevation: 8,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 children: [
                   // text
@@ -40,10 +41,21 @@ class User_card {
                         Text(u['role']!,
                             style: TextStyle(color: Colors.grey[700])),
                         const Spacer(),
-                        Text('see more ..',
-                            style: TextStyle(
-                                color: Theme.of(context).primaryColor,
-                                fontWeight: FontWeight.w600)),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    AdminSingleProfileScreen(user: u),
+                                // builder: (context) =>AdminSingleProfileScreen(user: u),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'see more ..',
+                          ),
+                        ),
                       ],
                     ),
                   ),
