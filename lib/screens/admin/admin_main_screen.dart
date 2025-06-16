@@ -1,3 +1,4 @@
+import 'package:exfactor/screens/admin/admin_manage_project&TaskScreen.dart';
 import 'package:exfactor/screens/admin/admin_manage_users.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/common/base_layout.dart';
@@ -18,7 +19,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
 
   final List<Widget> _screens = [
     const AdminHome(),
-    const AdminTaskScreen(),
+    const AdminProjectManage(),
     const AdminNotificationScreen(),
     const MangeUsers(),
   ];

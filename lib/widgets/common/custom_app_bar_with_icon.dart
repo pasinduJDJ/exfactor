@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-class CustomAppBarWithIcon extends StatelessWidget implements PreferredSizeWidget {
+class CustomAppBarWithIcon extends StatelessWidget
+    implements PreferredSizeWidget {
   final String title;
   final IconData icon;
   final VoidCallback? onIconTap;
@@ -25,7 +26,8 @@ class CustomAppBarWithIcon extends StatelessWidget implements PreferredSizeWidge
             bottomRight: Radius.circular(20),
           ),
           boxShadow: [
-            BoxShadow(color: Colors.black12, blurRadius: 5, offset: Offset(0, 2)),
+            BoxShadow(
+                color: Colors.black12, blurRadius: 5, offset: Offset(0, 2)),
           ],
         ),
         child: Row(

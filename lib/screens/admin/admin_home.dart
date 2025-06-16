@@ -44,7 +44,7 @@ class _AdminHomeState extends State<AdminHome> {
         const SizedBox(height: 30),
         // Btn
         CustomButton(
-          text: "Add New Project",
+          text: "Manage Projects",
           onPressed: () {},
           backgroundColor: kPrimaryColor,
           width: double.infinity,
@@ -59,7 +59,7 @@ class _AdminHomeState extends State<AdminHome> {
           tasks.where((t) => t.status == 'overdue').toList(),
         ),
         const SizedBox(height: 30),
-        //label 
+        //label
         const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
