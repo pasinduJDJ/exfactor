@@ -33,6 +33,7 @@ class _TaskTrackingBodyState extends State<TaskTrackingBody> {
       {'label': 'Complete', 'count': 2, 'color': cardLightBlue},
     ];
     return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(children: [
         const SizedBox(height: 30),
         // Summary Cards

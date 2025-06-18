@@ -1,12 +1,13 @@
+import 'package:exfactor/screens/supervisor/supervisor_notification.dart';
+import 'package:exfactor/widgets/common/custom_app_bar_with_icon.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/common/base_layout.dart';
 import 'supervisor_home.dart';
 import 'supervisor_task_screen.dart';
-import 'supervisor_team_screen.dart';
 import 'supervisor_profile_screen.dart';
 
 class SupervisorMainScreen extends StatefulWidget {
-  const SupervisorMainScreen({super.key});
+  const SupervisorMainScreen({super.key}); 
 
   @override
   State<SupervisorMainScreen> createState() => _SupervisorMainScreenState();
@@ -18,7 +19,7 @@ class _SupervisorMainScreenState extends State<SupervisorMainScreen> {
   final List<Widget> _screens = [
     const SupervisorHome(),
     const SupervisorTaskScreen(),
-    const SupervisorTeamScreen(),
+    const SupervisorNotification(),
     const SupervisorProfileScreen(),
   ];
 
@@ -32,8 +33,8 @@ class _SupervisorMainScreenState extends State<SupervisorMainScreen> {
       label: 'Tasks',
     ),
     BottomNavigationBarItem(
-      icon: Icon(Icons.group),
-      label: 'Team',
+      icon: Icon(Icons.notifications),
+      label: 'Notifications',
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.person),
@@ -41,12 +42,28 @@ class _SupervisorMainScreenState extends State<SupervisorMainScreen> {
     ),
   ];
 
+  PreferredSizeWidget? _getCustomAppBar() {
+    switch (_currentIndex) {
+      case 1:
+        return const CustomAppBarWithIcon(
+            title: 'Epic Task Tracking', icon: Icons.list_alt);
+      case 2:
+        return const CustomAppBarWithIcon(
+            title: 'Notifications', icon: Icons.notifications_active);
+      case 3:
+        return const CustomAppBarWithIcon(
+            title: 'My Profile', icon: Icons.account_circle);
+      default:
+        return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BaseLayout(
       title: 'Supervisor Dashboard',
       subtitle: 'Manage your team',
-      profileImage: 'assets/images/avatar.png',
+      profileImage: 'assets/images/man-avatar.png',
       onProfileTap: () {
         // TODO: Implement profile action
       },
@@ -54,6 +71,7 @@ class _SupervisorMainScreenState extends State<SupervisorMainScreen> {
       currentIndex: _currentIndex,
       onIndexChanged: (index) => setState(() => _currentIndex = index),
       navigationItems: _navigationItems,
+      customAppBar: _getCustomAppBar(),
     );
   }
 }

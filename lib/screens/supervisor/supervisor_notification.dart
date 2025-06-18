@@ -1,15 +1,15 @@
 import 'package:exfactor/utils/colors.dart';
+import 'package:exfactor/utils/constants.dart';
 import 'package:flutter/material.dart';
-import '../../utils/constants.dart';
 
-class TechnicalReportScreen extends StatefulWidget {
-  const TechnicalReportScreen({Key? key}) : super(key: key);
+class SupervisorNotification extends StatefulWidget {
+  const SupervisorNotification({super.key});
 
   @override
-  State<TechnicalReportScreen> createState() => _TechnicalReportScreenState();
+  State<SupervisorNotification> createState() => _SupervisorNotificationState();
 }
 
-class _TechnicalReportScreenState extends State<TechnicalReportScreen> {
+class _SupervisorNotificationState extends State<SupervisorNotification> {
   @override
   Widget build(BuildContext context) {
     final notification = [
@@ -30,7 +30,6 @@ class _TechnicalReportScreenState extends State<TechnicalReportScreen> {
         'type': 'birthday',
       },
     ];
-
     return Container(
       color: KbgColor,
       padding: const EdgeInsets.all(AppConstants.defaultPadding),

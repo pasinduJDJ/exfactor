@@ -96,28 +96,4 @@ String? validateNumber(String? value) {
   return null;
 }
 
-String? validateFutureDate(String? value) {
-  if (value == null || value.isEmpty) {
-    return 'Date cannot be empty';
-  }
-  final dateRegex = RegExp(r'^\d{4}-\d{2}-\d{2}$');
-  if (!dateRegex.hasMatch(value)) {
-    return 'Invalid date format, use YYYY-MM-DD';
-  } else if (DateTime.now().isBefore(DateTime.parse(value))) {
-    return 'Date cannot be in the future';
-  }
-  return null;
-}
 
-String? validatePastDate(String? value) {
-  if (value == null || value.isEmpty) {
-    return 'Date cannot be empty';
-  }
-  final dateRegex = RegExp(r'^\d{4}-\d{2}-\d{2}$');
-  if (!dateRegex.hasMatch(value)) {
-    return 'Invalid date format, use YYYY-MM-DD';
-  } else if (DateTime.now().isAfter(DateTime.parse(value))) {
-    return 'Date cannot be in the past';
-  }
-  return null;
-}

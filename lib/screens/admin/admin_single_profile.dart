@@ -1,15 +1,16 @@
 import 'package:exfactor/widgets/common/custom_app_bar_with_icon.dart';
+import 'package:exfactor/widgets/common/custom_button.dart';
 import 'package:flutter/material.dart';
 import '../../utils/colors.dart';
 
 class AdminSingleProfileScreen extends StatelessWidget {
   final Map<String, String> user;
+
   const AdminSingleProfileScreen({Key? key, required this.user})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Mock user data
     final user = {
       'name': 'Pasindu Dulanajana',
       'email': 'dp@exfsys.com',
@@ -26,20 +27,6 @@ class AdminSingleProfileScreen extends StatelessWidget {
     };
     return Scaffold(
       backgroundColor: KbgColor,
-      // appBar: AppBar(
-      //   title: Text(user['name']!,
-      //       style: const TextStyle(fontWeight: FontWeight.bold)),
-      //   backgroundColor: kPrimaryColor,
-      //   foregroundColor: kWhite,
-      //   elevation: 1,
-      //   iconTheme: const IconThemeData(color: kWhite),
-      //   actions: [
-      //     IconButton(
-      //       icon: const Icon(Icons.groups),
-      //       onPressed: () {},
-      //     ),
-      //   ],
-      // ),
       appBar:
           CustomAppBarWithIcon(icon: Icons.person, title: "Pasindu Dulanajana"),
       body: Padding(
@@ -57,7 +44,7 @@ class AdminSingleProfileScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     CircleAvatar(
-                      radius: 48,
+                      radius: 75,
                       backgroundImage: AssetImage(user['avatar']!),
                     ),
                     const SizedBox(height: 16),
@@ -72,27 +59,26 @@ class AdminSingleProfileScreen extends StatelessWidget {
                     const SizedBox(height: 10),
                     const Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('Emergency Contact..',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: Text(
+                        'Emergency Contact..',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                     _infoRow('Full Name', user['emergencyName']!),
                     _infoRow('Relationship', user['emergencyRelation']!),
                     _infoRow('Contact number', user['emergencyNumber']!),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    CustomButton(
+                      text: "Remove Member",
+                      onPressed: () {},
+                      backgroundColor: cardDarkRed,
+                      width: double.infinity / 2,
+                    ),
                   ],
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: cardDarkRed,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              onPressed: () {},
-              child: const Text('Remove Team'),
             ),
           ],
         ),
@@ -102,12 +88,15 @@ class AdminSingleProfileScreen extends StatelessWidget {
 
   Widget _infoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('$label : ',
-              style: const TextStyle(fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value)),
+          Expanded(
+              flex: 4,
+              child: Text('$label :',
+                  style: const TextStyle(fontWeight: FontWeight.w500))),
+          Expanded(flex: 6, child: Text(value)),
         ],
       ),
     );

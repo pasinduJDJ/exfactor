@@ -1,174 +1,116 @@
+import 'package:exfactor/screens/admin/admin_add_task_screen.dart';
 import 'package:exfactor/utils/colors.dart';
+import 'package:exfactor/widgets/utils_widget.dart';
 import 'package:flutter/material.dart';
 import '../../utils/constants.dart';
 import '../../widgets/common/custom_button.dart';
 
-class SupervisorTaskScreen extends StatelessWidget {
+class SupervisorTaskScreen extends StatefulWidget {
   const SupervisorTaskScreen({Key? key}) : super(key: key);
 
   @override
+  State<SupervisorTaskScreen> createState() => _SupervisorTaskScreenState();
+}
+
+class _SupervisorTaskScreenState extends State<SupervisorTaskScreen> {
+  @override
   Widget build(BuildContext context) {
-    final tasks = [
-      {
-        'title': 'Server Maintenance',
-        'assignee': 'John Doe',
-        'status': 'In Progress',
-        'priority': 'High',
-        'dueDate': '2024-03-20',
-      },
-      {
-        'title': 'Network Setup',
-        'assignee': 'Jane Smith',
-        'status': 'Pending',
-        'priority': 'Medium',
-        'dueDate': '2024-03-22',
-      },
-      {
-        'title': 'Security Audit',
-        'assignee': 'Mike Johnson',
-        'status': 'Completed',
-        'priority': 'High',
-        'dueDate': '2024-03-18',
-      },
+    List<Map<String, dynamic>> statusItems = [
+      {'label': 'OVER DUE', 'count': 0, 'color': cardRed},
+      {'label': 'PENDING', 'count': 5, 'color': cardYellow},
+      {'label': 'ON PROGRESS', 'count': 15, 'color': cardGreen},
+      {'label': 'Complete', 'count': 2, 'color': cardLightBlue},
     ];
 
-    return Container(
-      color: KbgColor,
-      padding: const EdgeInsets.all(AppConstants.defaultPadding),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Team Tasks',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: kPrimaryColor,
-                ),
-              ),
-              CustomButton(
-                text: 'New Task',
-                onPressed: () {
-                  // TODO: Navigate to task creation
-                },
-              ),
-            ],
+          SizedBox(height: 20),
+          UserUtils.buildStatusSummaryCard(statusItems),
+          const SizedBox(
+            height: 20,
           ),
-          const SizedBox(height: AppConstants.defaultSpacing * 2),
-          Expanded(
-            child: ListView.builder(
-              itemCount: tasks.length,
-              itemBuilder: (context, index) {
-                final task = tasks[index];
-                return Card(
-                  margin: const EdgeInsets.only(
-                    bottom: AppConstants.defaultSpacing,
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(
-                      AppConstants.defaultPadding,
-                    ),
-                    title: Text(
-                      task['title'] as String,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: AppConstants.defaultSpacing / 2),
-                        Text('Assignee: ${task['assignee']}'),
-                        Text('Due Date: ${task['dueDate']}'),
-                        const SizedBox(height: AppConstants.defaultSpacing / 2),
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color:
-                                    _getStatusColor(task['status'] as String),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                task['status'] as String,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: _getPriorityColor(
-                                    task['priority'] as String),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                task['priority'] as String,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.more_vert),
-                      onPressed: () {
-                        // TODO: Show task actions
-                      },
-                    ),
-                    onTap: () {
-                      // TODO: Navigate to task details
-                    },
-                  ),
-                );
-              },
-            ),
+          CustomButton(
+            text: "Add New Task",
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const AdminAddTaskScreen()));
+            },
+            width: double.infinity,
+            icon: Icon(Icons.task),
           ),
+          const SizedBox(
+            height: 40,
+          ),
+          const Text(
+            "Currently Assign Projects | Tasks",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          supervisorTaskCard()
         ],
       ),
     );
   }
+}
 
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return Colors.green;
-      case 'in progress':
-        return Colors.blue;
-      case 'pending':
-        return Colors.orange;
-      default:
-        return Colors.grey;
-    }
-  }
+class supervisorTaskCard extends StatelessWidget {
+  const supervisorTaskCard({
+    super.key,
+  });
 
-  Color _getPriorityColor(String priority) {
-    switch (priority.toLowerCase()) {
-      case 'high':
-        return Colors.red;
-      case 'medium':
-        return Colors.orange;
-      case 'low':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 8,
+      shadowColor: kblack,
+      child: Padding(
+        padding: const EdgeInsets.all(AppConstants.defaultPadding),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Task Name : ABC Mobile App Project",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              "Current Status: On Progress",
+            ),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    "Request : Complete",
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: cardGreen.withOpacity(0.2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    onPressed: () {},
+                    child: const Text(
+                      "Approve",
+                      style: TextStyle(color: cardGreen),
+                    ),
+                  ),
+                )
+              ],
+            )
+          ],
+        ),
+      ),
+    );
   }
 }

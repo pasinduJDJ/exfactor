@@ -26,7 +26,6 @@ class _AddUserScreenState extends State<AddUserScreen> {
   final _dobController = TextEditingController();
   final _joinDateController = TextEditingController();
   final _designationController = TextEditingController();
-  final _profileImageController = TextEditingController();
   final _emergencyContactNameController = TextEditingController();
   final _emergencyContactNumberController = TextEditingController();
   final _emergencyContactRelationController = TextEditingController();
@@ -39,6 +38,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
   DateTime? _selectedDOB;
   DateTime? _selectedJoinDate;
   DateTime? _selectedDesignationDate;
+  File? _pickedImage;
 
   final List<String> _roles = [
     'Select Role',
@@ -54,86 +54,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
   ];
 
   @override
-  void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
-    _passwordController.dispose();
-    _userNameconroller.dispose();
-    _dobController.dispose();
-    _joinDateController.dispose();
-    _designationController.dispose();
-    _profileImageController.dispose();
-    _emergencyContactNameController.dispose();
-    _emergencyContactNumberController.dispose();
-    _emergencyContactRelationController.dispose();
 
-    super.dispose();
-  }
-
-  Future<void> _selectDOB() async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-
-    if (pickedDate != null) {
-      setState(() {
-        _selectedDOB = pickedDate;
-        _dobController.text = "${pickedDate.toLocal()}".split(' ')[0];
-      });
-    }
-  }
-
-  Future<void> _selectJoinDate() async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2016),
-      lastDate: DateTime.now(),
-    );
-
-    if (pickedDate != null) {
-      setState(() {
-        _selectedJoinDate = pickedDate;
-        _joinDateController.text = "${pickedDate.toLocal()}".split(' ')[0];
-      });
-    }
-  }
-
-  Future<void> _selectDesignationDate() async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2030),
-    );
-
-    if (pickedDate != null) {
-      setState(() {
-        _selectedDesignationDate = pickedDate;
-        _designationController.text = "${pickedDate.toLocal()}".split(' ')[0];
-      });
-    }
-  }
-
-  File? _pickedImage;
-
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      print("Picked image path: ${image.path}");
-      setState(() {
-        _pickedImage = File(image.path);
-      });
-    }
-  }
-
+  // Validate and pass data into database
   Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -174,12 +96,16 @@ class _AddUserScreenState extends State<AddUserScreen> {
       // Upload profile image
       final imageUrl = await FirebaseService.uploadProfileImage(_pickedImage!);
 
+      String? supervisorId = _selectedSupervisor != 'Select Supervisor'
+          ? _selectedSupervisor
+          : null;
+
       // Create user model
       final user = UserModel(
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         email: _emailController.text.trim(),
-        mobile: _phoneController.text.trim(),
+        contactNumber: _phoneController.text.trim(),
         dob: _selectedDOB!,
         joinDate: _selectedJoinDate!,
         designationDate: _selectedDesignationDate!,
@@ -189,18 +115,14 @@ class _AddUserScreenState extends State<AddUserScreen> {
         emergencyContact: {
           'name': _emergencyContactNameController.text.trim(),
           'number': _emergencyContactNumberController.text.trim(),
-          'relation': _emergencyContactRelationController.text.trim(),
+          'relationship': _emergencyContactRelationController.text.trim(),
         },
-        password: _passwordController.text,
       );
 
-      // Register user
       await FirebaseService.registerUser(user, _passwordController.text);
 
       if (mounted) {
         _showToast('User registered successfully!');
-        // Clear all fields after successful registration
-        _clearForm();
         Navigator.pop(context);
       }
     } catch (e) {
@@ -214,28 +136,338 @@ class _AddUserScreenState extends State<AddUserScreen> {
     }
   }
 
-  void _clearForm() {
-    _firstNameController.clear();
-    _lastNameController.clear();
-    _userNameconroller.clear();
-    _emailController.clear();
-    _phoneController.clear();
-    _dobController.clear();
-    _joinDateController.clear();
-    _designationController.clear();
-    _profileImageController.clear();
-    _emergencyContactNameController.clear();
-    _emergencyContactNumberController.clear();
-    _emergencyContactRelationController.clear();
-    _passwordController.clear();
-    setState(() {
-      _selectedRole = 'Select Role';
-      _selectedSupervisor = 'Select Supervisor';
-      _selectedDOB = null;
-      _selectedJoinDate = null;
-      _selectedDesignationDate = null;
-      _pickedImage = null;
-    });
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: KbgColor,
+      appBar: AppBar(
+        title: Text("Add New Team Member"),
+        backgroundColor: kPrimaryColor,
+        foregroundColor: kWhite,
+        elevation: 1,
+        iconTheme: const IconThemeData(color: kWhite),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppConstants.defaultPadding),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildTextField(_firstNameController, "Enter First Name"),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
+              _buildTextField(_lastNameController, "Enter Last Name"),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
+              _buildTextField(_userNameconroller, "Enter User Name"),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
+              _buildTextEmailField(_emailController, "Enter Email Address"),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
+              _buildNumberField(_phoneController, "Enter Contact Number"),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
+              _buildDOBDateField("Select Date Of Birth", _selectedDOB,
+                  (pickedDate) {
+                setState(() {
+                  _selectedDOB = pickedDate;
+                });
+              }),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Select Profile Image"),
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      height: 50,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.circular(AppConstants.defaultRadius),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.image, color: Colors.grey),
+                          const SizedBox(width: 10),
+                          Text(
+                            _pickedImage != null
+                                ? "Image Selected"
+                                : "Tap to pick image",
+                            style: TextStyle(color: Colors.grey[700]),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
+              _buildJoinDateField("Select Join Date", _selectedJoinDate,
+                  (pickedDate) {
+                setState(() {
+                  _selectedJoinDate = pickedDate;
+                });
+              }),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
+              _buildDesignationDateField(
+                  "Select Designation Date", _selectedDesignationDate,
+                  (pickedDate) {
+                setState(() {
+                  _selectedDesignationDate = pickedDate;
+                });
+              }),
+              const SizedBox(height: AppConstants.defaultSpacing * 3),
+              _buildTextField(_emergencyContactNameController,
+                  "Enter Emergency Contact Name"),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
+              _buildNumberField(_emergencyContactNumberController,
+                  "Enter Emergency Contact Number"),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
+              _buildTextField(
+                  _emergencyContactRelationController, "Enter Relation ship"),
+              const SizedBox(height: AppConstants.defaultSpacing * 3),
+              _buildTextField(_passwordController, "Enter Password"),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
+              _buildDropdown(
+                "Select Supervisor",
+                _supervisor,
+                _selectedSupervisor,
+                (val) => setState(
+                    () => _selectedSupervisor = val ?? "Select Supervisor"),
+              ),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
+              _buildDropdown(
+                "Select Position",
+                _roles,
+                _selectedRole,
+                (val) => setState(() => _selectedRole = val ?? "Select Role"),
+              ),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
+              CustomButton(
+                text: 'Create User',
+                onPressed: _handleSubmit,
+                isLoading: _isLoading,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Image Picker Field
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      print("Picked image path: ${image.path}");
+      setState(() {
+        _pickedImage = File(image.path);
+      });
+    }
+  }
+
+  // Text Field with Requiered Validation
+  Widget _buildTextField(TextEditingController? controller, String hint,
+      {bool enabled = true, Widget? suffix}) {
+    return TextFormField(
+      controller: controller,
+      enabled: enabled,
+      decoration: InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        suffixIcon: suffix,
+      ),
+      validator: validateRequired,
+    );
+  }
+
+  // Text Feild with Email Validation
+  Widget _buildTextEmailField(TextEditingController? controller, String hint,
+      {bool enabled = true, Widget? suffix}) {
+    return TextFormField(
+      controller: controller,
+      enabled: enabled,
+      decoration: InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        suffixIcon: suffix,
+      ),
+      validator: validateEmail,
+    );
+  }
+
+  //Number Field with Number Validation
+  Widget _buildNumberField(TextEditingController? controller, String hint,
+      {bool enabled = true, Widget? suffix}) {
+    return TextFormField(
+      controller: controller,
+      enabled: enabled,
+      decoration: InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        suffixIcon: suffix,
+      ),
+      validator: validateNumber,
+    );
+  }
+
+  //DropDown with Validate
+  Widget _buildDropdown(String hint, List<String> items, String? value,
+      ValueChanged<String?> onChanged) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      hint: Text(hint),
+      items:
+          items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none),
+        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+      ),
+      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+    );
+  }
+
+  // Text Field with DOB Validation
+  Widget _buildDOBDateField(
+      String label, DateTime? date, Function(DateTime) onDateSelected) {
+    return GestureDetector(
+      onTap: () async {
+        //DateTime now = DateTime.now();
+        final DateTime? picked = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime(1900),
+          lastDate: DateTime.now(),
+        );
+        if (picked != null) {
+          onDateSelected(picked);
+        }
+      },
+      child: AbsorbPointer(
+        child: TextFormField(
+          decoration: InputDecoration(
+            hintText: label,
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            suffixIcon: const Icon(Icons.calendar_today, size: 20),
+          ),
+          controller: TextEditingController(
+              text: date == null
+                  ? ''
+                  : '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}'),
+          validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+        ),
+      ),
+    );
+  }
+
+  // Join Date Field with Validation
+  Widget _buildJoinDateField(
+      String label, DateTime? date, Function(DateTime) onDateSelected) {
+    return GestureDetector(
+      onTap: () async {
+        //DateTime now = DateTime.now();
+        final DateTime? picked = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime(2016),
+          lastDate: DateTime.now(),
+        );
+        if (picked != null) {
+          onDateSelected(picked);
+        }
+      },
+      child: AbsorbPointer(
+        child: TextFormField(
+          decoration: InputDecoration(
+            hintText: label,
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            suffixIcon: const Icon(Icons.calendar_today, size: 20),
+          ),
+          controller: TextEditingController(
+              text: date == null
+                  ? ''
+                  : '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}'),
+          validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+        ),
+      ),
+    );
+  }
+
+  // Designation Date Field with Validation
+  Widget _buildDesignationDateField(
+      String label, DateTime? date, Function(DateTime) onDateSelected) {
+    return GestureDetector(
+      onTap: () async {
+        //DateTime now = DateTime.now();
+        final DateTime? picked = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime.now(),
+          lastDate: DateTime(2030),
+        );
+        if (picked != null) {
+          onDateSelected(picked);
+        }
+      },
+      child: AbsorbPointer(
+        child: TextFormField(
+          decoration: InputDecoration(
+            hintText: label,
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            suffixIcon: const Icon(Icons.calendar_today, size: 20),
+          ),
+          controller: TextEditingController(
+              text: date == null
+                  ? ''
+                  : '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}'),
+          validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+        ),
+      ),
+    );
   }
 
   void _showToast(String message) {
@@ -250,269 +482,6 @@ class _AddUserScreenState extends State<AddUserScreen> {
           : Colors.green,
       textColor: Colors.white,
       fontSize: 14.0,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Add New Team Member"),
-        backgroundColor: kPrimaryColor,
-        foregroundColor: kWhite,
-      ),
-      body: Container(
-        color: KbgColor,
-        child: ResponsiveBuilder(
-          builder: (context, constraints, info) {
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppConstants.defaultPadding),
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxWidth: info.isMobile ? double.infinity : 600,
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // First Name
-                        CustomTextField(
-                          label: "Enter First Name",
-                          controller: _firstNameController,
-                          textCapitalization: TextCapitalization.words,
-                          validator: validateRequired,
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 2),
-                        //Last Name
-                        CustomTextField(
-                          label: 'Enter Last Name',
-                          controller: _lastNameController,
-                          textCapitalization: TextCapitalization.words,
-                          validator: validateRequired,
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 2),
-                        //User Name
-                        CustomTextField(
-                          label: 'Enter User Name',
-                          controller: _userNameconroller,
-                          textCapitalization: TextCapitalization.words,
-                          validator: validateRequired,
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 2),
-                        //Email
-                        CustomTextField(
-                          label: 'Enter Email Address',
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          validator: validateEmail,
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 2),
-                        // Phone Number
-                        CustomTextField(
-                          label: 'Enter Contact Number',
-                          controller: _phoneController,
-                          keyboardType: TextInputType.phone,
-                          validator: validatePhoneNumber,
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 2),
-                        // Dob
-                        CustomTextField(
-                          label: 'Select Date of Birth',
-                          controller: _dobController,
-                          onTap: _selectDOB,
-                          suffixIcon: const Icon(Icons.calendar_today),
-                          validator: validateRequired,
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 2),
-                        //Profile Image
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text("Select Profile Image"),
-                            GestureDetector(
-                              onTap: _pickImage,
-                              child: Container(
-                                height: 50,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(
-                                      AppConstants.defaultRadius),
-                                  border: Border.all(color: Colors.grey[300]!),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.image, color: Colors.grey),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      _pickedImage != null
-                                          ? "Image Selected"
-                                          : "Tap to pick image",
-                                      style: TextStyle(color: Colors.grey[700]),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 2),
-                        // Joined Date
-                        CustomTextField(
-                          label: 'Select Joined Date',
-                          controller: _joinDateController,
-                          onTap: _selectJoinDate,
-                          suffixIcon: const Icon(Icons.calendar_today),
-                          validator: validateRequired,
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 2),
-                        // Designation Date
-                        CustomTextField(
-                          label: 'Select Designation Date',
-                          controller: _designationController,
-                          onTap: _selectDesignationDate,
-                          suffixIcon: const Icon(Icons.calendar_today),
-                          validator: validateRequired,
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 3),
-                        // Emergency Contact Name
-                        CustomTextField(
-                          label: 'Emergency Contact Name',
-                          controller: _emergencyContactNameController,
-                          textCapitalization: TextCapitalization.words,
-                          validator: validateRequired,
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 2),
-                        // Emergency Contact Number
-                        CustomTextField(
-                          label: 'Emergency Contact Number',
-                          controller: _emergencyContactNumberController,
-                          keyboardType: TextInputType.phone,
-                          validator: validateRequired,
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 2),
-                        // Emergency Contact Relation
-                        CustomTextField(
-                          label: 'RelationShip',
-                          controller: _emergencyContactRelationController,
-                          textCapitalization: TextCapitalization.words,
-                          validator: validateRequired,
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 3),
-                        // Password
-                        CustomTextField(
-                          label: 'Enter Password',
-                          controller: _passwordController,
-                          obscureText: true,
-                          validator: validatePassword,
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 2),
-                        // Select Supervisor
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Select Supervisor',
-                              style: Theme.of(context).textTheme.labelMedium,
-                            ),
-                            const SizedBox(
-                                height: AppConstants.defaultSpacing / 2),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppConstants.defaultPadding,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.grey[300]!),
-                              ),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  value:
-                                      _supervisor.contains(_selectedSupervisor)
-                                          ? _selectedSupervisor
-                                          : null,
-                                  isExpanded: true,
-                                  items: _supervisor.map((String supervisor) {
-                                    return DropdownMenuItem<String>(
-                                      value: supervisor,
-                                      child: Text(supervisor),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    if (newValue != null) {
-                                      setState(
-                                          () => _selectedSupervisor = newValue);
-                                    }
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 2),
-                        // Select Permission Type
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Select Permission Type',
-                              style: Theme.of(context).textTheme.labelMedium,
-                            ),
-                            const SizedBox(
-                                height: AppConstants.defaultSpacing / 2),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppConstants.defaultPadding,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(
-                                  AppConstants.defaultRadius,
-                                ),
-                                border: Border.all(color: Colors.grey[300]!),
-                              ),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  value: _roles.contains(_selectedRole)
-                                      ? _selectedRole
-                                      : null,
-                                  isExpanded: true,
-                                  items: _roles.map((String role) {
-                                    return DropdownMenuItem<String>(
-                                      value: role,
-                                      child: Text(role),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    if (newValue != null) {
-                                      setState(() => _selectedRole = newValue);
-                                    }
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppConstants.defaultSpacing * 2),
-                        CustomButton(
-                          text: 'Create User',
-                          onPressed: _handleSubmit,
-                          isLoading: _isLoading,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
     );
   }
 }

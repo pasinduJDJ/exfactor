@@ -33,6 +33,7 @@ class _TechnicalHomeState extends State<TechnicalHome> {
       {'label': 'Complete', 'count': 2, 'color': cardLightBlue},
     ];
     return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(children: [
         SizedBox(height: 20),
         UserUtils.buildStatusSummaryCard(statusItems),

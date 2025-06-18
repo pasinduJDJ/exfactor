@@ -1,3 +1,4 @@
+import 'package:exfactor/utils/constants.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/common/custom_button.dart';
 import '../../utils/colors.dart';
@@ -50,7 +51,7 @@ class _AdminAddTaskScreenState extends State<AdminAddTaskScreen> {
         iconTheme: const IconThemeData(color: kWhite),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppConstants.defaultPadding),
         child: Form(
           key: _formKey,
           child: Column(

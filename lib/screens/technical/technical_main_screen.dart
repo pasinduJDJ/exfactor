@@ -60,7 +60,7 @@ class _TechnicalMainScreenState extends State<TechnicalMainScreen> {
     return BaseLayout(
       title: 'Technical Dashboard',
       subtitle: 'Manage your tasks',
-      profileImage: 'assets/images/man-avatar.jpg',
+      profileImage: 'assets/images/man-avatar.png',
       onProfileTap: () {},
       body: _screens[_currentIndex],
       currentIndex: _currentIndex,

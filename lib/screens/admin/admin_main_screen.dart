@@ -64,7 +64,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
     return BaseLayout(
       title: 'Chamuly D.',
       subtitle: 'CEO & Founder',
-      profileImage: 'assets/images/man-avatar.jpg',
+      profileImage: 'assets/images/man-avatar.png',
       onProfileTap: () {},
       body: _screens[_currentIndex],
       currentIndex: _currentIndex,

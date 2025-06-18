@@ -46,6 +46,7 @@ class AdminSingleProjectScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _infoRow('Project Title', project['title'] as String),
+                    const SizedBox(height: 5),
                     _infoRow(
                         'Project Initial No', project['initialNo'] as String),
                     _infoRow('Project Message', project['message'] as String),
@@ -86,41 +87,36 @@ class AdminSingleProjectScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
               elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text('Task List',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    ...List.generate(
-                        (project['tasks'] as List<String>).length,
-                        (i) => ListTile(
-                              title:
-                                  Text((project['tasks'] as List<String>)[i]),
-                              trailing: TextButton(
-                                onPressed: () {},
-                                child: const Text('See more..'),
-                              ),
-                            )),
-                  ],
-                ),
+                    child: const Text('Task List',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                  ...List.generate(
+                      (project['tasks'] as List<String>).length,
+                      (i) => ListTile(
+                            title: Text((project['tasks'] as List<String>)[i]),
+                            trailing: TextButton(
+                              onPressed: () {},
+                              child: const Text('See more..'),
+                            ),
+                          )),
+                ],
               ),
             ),
           ],
         ),
-      ),
+      ),  
     );
   }
 

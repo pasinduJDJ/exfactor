@@ -66,7 +66,7 @@ class _MangeUsersState extends State<MangeUsers> {
               ),
             ],
           ),
-          User_card.buildUserGridCard(users),
+          UserCard.buildUserGridCard(users),
         ],
       ),
     );
