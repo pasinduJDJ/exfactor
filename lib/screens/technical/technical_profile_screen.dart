@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:exfactor/screens/login_page.dart';
 import 'package:exfactor/utils/colors.dart';
@@ -39,7 +38,7 @@ class _TechnicalProfileScreenState extends State<TechnicalProfileScreen> {
 
             // Avatar
             CircleAvatar(
-              radius: 50,
+              radius: 70,
               backgroundColor: Colors.white,
               backgroundImage: AssetImage(user['avatar']!),
             ),
@@ -86,6 +85,7 @@ class _TechnicalProfileScreenState extends State<TechnicalProfileScreen> {
                     backgroundColor: cardRed,
                     width: double.infinity,
                   ),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),

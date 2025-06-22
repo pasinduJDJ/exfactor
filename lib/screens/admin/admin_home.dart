@@ -1,7 +1,9 @@
 import 'package:exfactor/models/task_model.dart';
+import 'package:exfactor/screens/admin/admin_add_task_screen.dart';
 import 'package:exfactor/utils/colors.dart';
 import 'package:exfactor/widgets/common/custom_button.dart';
 import 'package:exfactor/widgets/utils_widget.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:exfactor/screens/admin/admin_single_project_screen.dart';
 import 'package:exfactor/screens/admin/admin_single_task_screen.dart';
@@ -19,13 +21,13 @@ class _AdminHomeState extends State<AdminHome> {
   bool showOverdue = false;
   bool showComplete = false;
 
-  final List<Task> tasks = [
-    Task(title: 'Database Migration', status: 'progress'),
-    Task(title: 'Task 2', status: 'progress'),
-    Task(title: 'Overdue Report', status: 'overdue'),
-    Task(title: 'Pending Review', status: 'pending'),
-    Task(title: 'Completed Feature', status: 'complete'),
-  ];
+  // final List<Task> tasks = [
+  //   Task(title: 'Database Migration', status: 'progress'),
+  //   Task(title: 'Task 2', status: 'progress'),
+  //   Task(title: 'Overdue Report', status: 'overdue'),
+  //   Task(title: 'Pending Review', status: 'pending'),
+  //   Task(title: 'Completed Feature', status: 'complete'),
+  // ];
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> statusItems = [
@@ -41,25 +43,28 @@ class _AdminHomeState extends State<AdminHome> {
         UserUtils.buildStatusSummaryCard(statusItems),
         const SizedBox(height: 30),
         CustomButton(
-          text: "Manage Projects",
-          onPressed: () {},
+          text: "Add Task",
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => AdminAddTaskScreen()));
+          },
           backgroundColor: kPrimaryColor,
           width: double.infinity,
           height: 48,
           icon: Icon(Icons.assignment_turned_in_outlined),
         ),
         const SizedBox(height: 30),
-        UserUtils.buildGroup(
-          'On Progress',
-          cardLightBlue,
-          tasks.where((t) => t.status == 'overdue').toList(),
-          (task) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => AdminSingleProjectScreen()),
-            );
-          },
-        ),
+        // UserUtils.buildGroup(
+        //   'On Progress',
+        //   cardLightBlue,
+        //   tasks.where((t) => t.status == 'overdue').toList(),
+        //   (task) {
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (_) => AdminSingleProjectScreen()),
+        //     );
+        //   },
+        // ),
         const SizedBox(height: 30),
         const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -69,17 +74,17 @@ class _AdminHomeState extends State<AdminHome> {
           ],
         ),
         const SizedBox(height: 10),
-        UserUtils.buildGroup(
-          'On Progress Task',
-          cardOrenge,
-          tasks.where((t) => t.status == 'progress').toList(),
-          (task) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => AdminSingleTaskScreen()),
-            );
-          },
-        ),
+        // UserUtils.buildGroup(
+        //   'On Progress Task',
+        //   cardOrenge,
+        //   tasks.where((t) => t.status == 'progress').toList(),
+        //   (task) {
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (_) => AdminSingleTaskScreen()),
+        //     );
+        //   },
+        // ),
       ]),
     );
   }

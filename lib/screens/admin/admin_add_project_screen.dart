@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../widgets/common/custom_button.dart';
 import '../../utils/colors.dart';
+import '../../services/superbase_service.dart';
+import '../../models/project_model.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class AdminAddProjectScreen extends StatefulWidget {
   const AdminAddProjectScreen({Key? key}) : super(key: key);
@@ -18,30 +21,84 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
   final _emailController = TextEditingController();
   final _mobileController = TextEditingController();
   final _countryController = TextEditingController();
-  String? _selectedTeam;
   String? _selectedSupervisor;
   DateTime? _commencementDate;
   DateTime? _deliveryDate;
+  bool _isLoading = false;
+  List<Map<String, dynamic>> _supervisors = [];
 
-  final List<String> _teamMembers = ['Team A', 'Team B', 'Team C'];
-  final List<String> _supervisors = ['Supervisor 1', 'Supervisor 2'];
+  @override
+  void initState() {
+    super.initState();
+    _loadSupervisors();
+  }
 
-  Future<void> _pickDate(BuildContext context, bool isCommencement) async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
+  // Load supervisors from database
+  Future<void> _loadSupervisors() async {
+    try {
+      final supervisors = await SupabaseService.getSupervisors();
       setState(() {
-        if (isCommencement) {
-          _commencementDate = picked;
-        } else {
-          _deliveryDate = picked;
-        }
+        _supervisors = supervisors;
       });
+    } catch (e) {
+      _showToast('Error loading supervisors: ${e.toString()}');
     }
+  }
+
+  // Handle project creation
+  Future<void> _handleSubmit() async {
+    if (!_formKey.currentState!.validate()) {
+      _showToast('Please fill all required fields.');
+      return;
+    }
+    if (_commencementDate == null || _deliveryDate == null) {
+      _showToast('Please select both commencement and delivery dates.');
+      return;
+    }
+    if (_selectedSupervisor == null) {
+      _showToast('Please select a supervisor.');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final project = ProjectModel(
+        projectTitle: _titleController.text.trim(),
+        projectDescription: _descController.text.trim(),
+        clientName: _clientController.text.trim(),
+        contactPerson: _contactPersonController.text.trim(),
+        contactPersonEmail: _emailController.text.trim(),
+        contactPersonPhone: _mobileController.text.trim(),
+        clientCountry: _countryController.text.trim(),
+        projectStartDate: _commencementDate!.toIso8601String(),
+        projectEndDate: _deliveryDate!.toIso8601String(),
+        supervisor: _selectedSupervisor!,
+        projectStatus: 'pending', // Default status for new projects
+      );
+
+      await SupabaseService.insertProject(project);
+      _showToast('Project created successfully!');
+      Navigator.of(context).pop();
+    } catch (e) {
+      _showToast('Error creating project: ${e.toString()}');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: message.toLowerCase().contains('error') ||
+              message.toLowerCase().contains('failed') ||
+              message.toLowerCase().contains('please')
+          ? Colors.red
+          : Colors.green,
+      textColor: Colors.white,
+      fontSize: 14.0,
+    );
   }
 
   @override
@@ -82,29 +139,53 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
               const SizedBox(height: 12),
               _buildTextField(_countryController, 'Enter Client Country'),
               const SizedBox(height: 12),
-              _buildDropdown('Select Team members', _teamMembers, _selectedTeam,
-                  (val) => setState(() => _selectedTeam = val)),
-              const SizedBox(height: 12),
-              _buildDropdown(
-                  'Select Supervisor',
-                  _supervisors,
-                  _selectedSupervisor,
-                  (val) => setState(() => _selectedSupervisor = val)),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDropdown(
+                        'Select Supervisor',
+                        _supervisors
+                            .map((e) => '${e['first_name']} ${e['last_name']}')
+                            .toList(),
+                        _selectedSupervisor,
+                        (val) => setState(() => _selectedSupervisor = val)),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: _loadSupervisors,
+                    icon: const Icon(Icons.refresh),
+                    tooltip: 'Refresh Supervisors',
+                  ),
+                ],
+              ),
+              if (_supervisors.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    'No supervisors found. Please add supervisors first.',
+                    style: TextStyle(color: Colors.orange, fontSize: 12),
+                  ),
+                ),
               const SizedBox(height: 12),
               _buildDateField('Select Commencement Date', _commencementDate,
-                  () => _pickDate(context, true)),
+                  (pickedDate) {
+                setState(() {
+                  _commencementDate = pickedDate;
+                });
+              }),
               const SizedBox(height: 12),
               _buildDateField('Select Expected Delivery Date', _deliveryDate,
-                  () => _pickDate(context, false)),
+                  (pickedDate) {
+                setState(() {
+                  _deliveryDate = pickedDate;
+                });
+              }),
               const SizedBox(height: 24),
               CustomButton(
                 text: 'Create Project',
                 backgroundColor: kPrimaryColor,
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // TODO: Handle create project
-                  }
-                },
+                onPressed: _handleSubmit,
+                isLoading: _isLoading,
               ),
             ],
           ),
@@ -152,9 +233,21 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
     );
   }
 
-  Widget _buildDateField(String label, DateTime? date, VoidCallback onTap) {
+  Widget _buildDateField(
+      String label, DateTime? date, Function(DateTime) onDateSelected) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () async {
+        //DateTime now = DateTime.now();
+        final DateTime? picked = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime(2025),
+          lastDate: DateTime(2030),
+        );
+        if (picked != null) {
+          onDateSelected(picked);
+        }
+      },
       child: AbsorbPointer(
         child: TextFormField(
           decoration: InputDecoration(

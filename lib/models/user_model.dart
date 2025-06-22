@@ -1,59 +1,59 @@
 class UserModel {
+  final int? userId;
   final String firstName;
   final String lastName;
   final String email;
-  final String contactNumber;
-  final DateTime dob;
+  final String mobile;
+  final DateTime birthday;
   final DateTime joinDate;
   final DateTime designationDate;
   final String role;
-  final String? supervisorId;
-  final String profileImageUrl;
-  final Map<String, String> emergencyContact;
+  final String profileImage;
+  final String? supervisor;
 
   UserModel({
+    this.userId,
     required this.firstName,
     required this.lastName,
     required this.email,
-    required this.contactNumber,
-    required this.dob,
+    required this.mobile,
+    required this.birthday,
     required this.joinDate,
     required this.designationDate,
     required this.role,
-    this.supervisorId,
-    required this.profileImageUrl,
-    required this.emergencyContact,
+    required this.profileImage,
+    this.supervisor,
   });
 
   Map<String, dynamic> toMap() {
     return {
-      'firstName': firstName,
-      'lastName': lastName,
+      'id': userId,
+      'first_name': firstName,
+      'last_name': lastName,
       'email': email,
-      'contactNumber': contactNumber,
-      'dob': dob.toIso8601String(),
-      'joinDate': joinDate.toIso8601String(),
-      'designationDate': designationDate.toIso8601String(),
+      'mobile': mobile,
+      'birthday': birthday.toIso8601String(),
+      'join_date': joinDate.toIso8601String(),
+      'designation_date': designationDate.toIso8601String(),
       'role': role,
-      'supervisorId': supervisorId,
-      'profileImageUrl': profileImageUrl,
-      'emergencyContact': emergencyContact,
+      'profile_image': profileImage,
+      'supervisor': supervisor,
     };
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-      firstName: map['firstName'],
-      lastName: map['lastName'],
-      email: map['email'],
-      contactNumber: map['contactNumber'],
-      dob: DateTime.parse(map['dob']),
-      joinDate: DateTime.parse(map['joinDate']),
-      designationDate: DateTime.parse(map['designationDate']),
-      role: map['role'],
-      supervisorId: map['supervisorId'],
-      profileImageUrl: map['profileImageUrl'],
-      emergencyContact: Map<String, String>.from(map['emergencyContact']),
+      userId: map['id'],
+      firstName: map['first_name'] ?? '',
+      lastName: map['last_name'] ?? '',
+      email: map['email'] ?? '',
+      mobile: map['mobile'] ?? '',
+      birthday: DateTime.parse(map['birthday']),
+      joinDate: DateTime.parse(map['join_date']),
+      designationDate: DateTime.parse(map['designation_date']),
+      role: map['role'] ?? '',
+      profileImage: map['profile_image'] ?? '',
+      supervisor: map['supervisor'],
     );
   }
 }

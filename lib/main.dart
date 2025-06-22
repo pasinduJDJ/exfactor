@@ -1,28 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'firebase_options.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'screens/splash_screen.dart';
 import 'utils/theme.dart';
 import 'utils/constants.dart';
-import 'services/firebase_service.dart';
-
-// This is the background message handler for Firebase Messaging
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  print("Background message: ${message.notification?.title}");
-}
 
 Future<void> main() async {
-  // Ensure that Flutter bindings are initialized before using Firebase 
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+  await Supabase.initialize(
+    url: 'https://djlogpntpcymdtxzybwx.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqbG9ncG50cGN5bWR0eHp5Ynd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzNDg4MDQsImV4cCI6MjA2NTkyNDgwNH0.W2_U0e4tD4SrFyAUWexgyrGlDwQZdkWNDJfe3yWJJM0',
   );
-  // Set up Firebase Messaging background handler
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  await FirebaseService.initialize();
   runApp(const MyApp());
 }
 

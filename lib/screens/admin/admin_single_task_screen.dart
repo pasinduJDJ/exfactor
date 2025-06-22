@@ -1,20 +1,51 @@
 import 'package:flutter/material.dart';
 import '../../utils/colors.dart';
+import 'package:exfactor/services/superbase_service.dart';
 
-class AdminSingleTaskScreen extends StatelessWidget {
-  const AdminSingleTaskScreen({Key? key}) : super(key: key);
+class AdminSingleTaskScreen extends StatefulWidget {
+  final String taskId;
+  const AdminSingleTaskScreen({Key? key, required this.taskId})
+      : super(key: key);
+
+  @override
+  State<AdminSingleTaskScreen> createState() => _AdminSingleTaskScreenState();
+}
+
+class _AdminSingleTaskScreenState extends State<AdminSingleTaskScreen> {
+  Map<String, dynamic>? task;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTask();
+  }
+
+  Future<void> fetchTask() async {
+    try {
+      final taskIdInt = int.tryParse(widget.taskId);
+      if (taskIdInt == null) {
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+      final data = await SupabaseService.getAllTasks();
+      final t = data.firstWhere((t) => t['task_id'].toString() == widget.taskId,
+          orElse: () => {});
+      setState(() {
+        task = t.isNotEmpty ? t : null;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Mock task data
-    final task = {
-      'title': 'Database Migration',
-      'project': 'Backend Migration',
-      'commencement': '2025-06-03',
-      'delivery': '2025-08-03',
-      'supervisor': 'Test User',
-      'status': 'In Progress',
-    };
     return Scaffold(
       backgroundColor: KbgColor,
       appBar: AppBar(
@@ -31,66 +62,77 @@ class AdminSingleTaskScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              elevation: 4,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: cardOrenge,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        topRight: Radius.circular(16),
-                      ),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 16),
-                    child: Text('Task Title : ${task['title']}',
-                        style: const TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold)),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _infoRow('Project Title', task['project']!),
-                        _infoRow('Commencement Date', task['commencement']!),
-                        _infoRow('Expected Delivery Date', task['delivery']!),
-                        _infoRow('Supervisor name', task['supervisor']!),
-                        _infoRow('Status', task['status']!),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: kPrimaryColor,
-                        foregroundColor: Colors.white,
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : task == null
+              ? const Center(child: Text('Task not found'))
+              : Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Card(
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                            borderRadius: BorderRadius.circular(16)),
+                        elevation: 4,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: cardOrenge,
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(16),
+                                  topRight: Radius.circular(16),
+                                ),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 12, horizontal: 16),
+                              child: Text(
+                                  'Task Title : ${task!['title'] ?? ''}',
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _infoRow('Project Title',
+                                      task!['p_id']?.toString() ?? ''),
+                                  _infoRow('Commencement Date',
+                                      task!['start_date'] ?? ''),
+                                  _infoRow('Expected Delivery Date',
+                                      task!['end_date'] ?? ''),
+                                  _infoRow('Supervisor name',
+                                      task!['supervisor'] ?? ''),
+                                  _infoRow('Status', task!['status'] ?? ''),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: kPrimaryColor,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8)),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                onPressed: () {},
+                                child: const Text('Remove'),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      onPressed: () {},
-                      child: const Text('Remove'),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+                ),
     );
   }
 

@@ -2,7 +2,8 @@ import 'package:exfactor/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class NotificationCard {
-  static Widget buildNotificationCards(List<Map<String, dynamic>> items) {
+  static Widget buildNotificationCards(List<Map<String, dynamic>> items,
+      {void Function(int notificationId)? onDelete}) {
     IconData _iconForType(String type) {
       switch (type) {
         case 'Event':
@@ -19,9 +20,9 @@ class NotificationCard {
     Color _colorForType(String type) {
       switch (type) {
         case 'Event':
-          return cardLightBlue;
+          return kPrimaryColor;
         case 'Birthday':
-          return cardOrenge;
+          return cardDarkYellow;
         case 'News':
           return cardGreen;
         default:
@@ -98,9 +99,14 @@ class NotificationCard {
                   IconButton(
                     icon: const Icon(Icons.delete),
                     color: cardRed,
-                    onPressed: () {
-                      // handle delete…
-                    },
+                    onPressed:
+                        onDelete != null && item['notification_id'] != null
+                            ? () => onDelete(item['notification_id'] is int
+                                ? item['notification_id']
+                                : int.tryParse(
+                                        item['notification_id'].toString()) ??
+                                    0)
+                            : null,
                   ),
                 ],
               ),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../utils/colors.dart';
+import '../../services/superbase_service.dart';
+import '../../models/notification_model.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class AdminAddNotificationScreen extends StatefulWidget {
   const AdminAddNotificationScreen({Key? key}) : super(key: key);
@@ -16,8 +19,9 @@ class _AdminAddNotificationScreenState
   final _messageController = TextEditingController();
   String? _selectedType;
   DateTime? _scheduleDate;
+  bool _isLoading = false;
 
-  final List<String> _noticeTypes = ['General', 'Event', 'Alert'];
+  final List<String> _noticeTypes = ['Event', 'Birthday', 'Alert'];
 
   Future<void> _pickDate(BuildContext context) async {
     final picked = await showDatePicker(
@@ -31,6 +35,55 @@ class _AdminAddNotificationScreenState
         _scheduleDate = picked;
       });
     }
+  }
+
+  // Handle notification creation
+  Future<void> _handleSubmit() async {
+    if (!_formKey.currentState!.validate()) {
+      _showToast('Please fill all required fields.');
+      return;
+    }
+    if (_scheduleDate == null) {
+      _showToast('Please select a schedule date.');
+      return;
+    }
+    if (_selectedType == null) {
+      _showToast('Please select a notice type.');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final notification = NotificationModel(
+        title: _titleController.text.trim(),
+        message: _messageController.text.trim(),
+        type: _selectedType!,
+        schedule_date: _scheduleDate!.toIso8601String(),
+      );
+
+      await SupabaseService.insertNotification(notification);
+      _showToast('Notification published successfully!');
+      Navigator.of(context).pop();
+    } catch (e) {
+      _showToast('Error publishing notification: ${e.toString()}');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: message.toLowerCase().contains('error') ||
+              message.toLowerCase().contains('failed') ||
+              message.toLowerCase().contains('please')
+          ? Colors.red
+          : Colors.green,
+      textColor: Colors.white,
+      fontSize: 14.0,
+    );
   }
 
   @override
@@ -145,12 +198,10 @@ class _AdminAddNotificationScreenState
                       borderRadius: BorderRadius.circular(8)),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // TODO: Handle publish notice
-                  }
-                },
-                child: const Text('Publish Notice'),
+                onPressed: _handleSubmit,
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text('Publish Notice'),
               ),
             ],
           ),

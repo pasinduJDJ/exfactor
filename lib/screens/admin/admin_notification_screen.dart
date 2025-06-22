@@ -3,35 +3,52 @@ import 'package:exfactor/utils/colors.dart';
 import 'package:exfactor/widgets/common/custom_button.dart';
 import 'package:exfactor/widgets/notification_card_view.dart';
 import 'package:flutter/material.dart';
+import 'package:exfactor/services/superbase_service.dart';
 
 class AdminNotificationScreen extends StatelessWidget {
   const AdminNotificationScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> notifications = [
-      {
-        'title': 'Server Upgrade',
-        'subtitle': 'Will be offline from 2–4 AM',
-        'type': 'Event',
-        'submission_date': '2025-06-16',
-      },
-      {
-        'title': "Harindu's Birthday",
-        'subtitle': 'Wish Harindu a happy birthday today!',
-        'type': 'Birthday',
-        'submission_date': '2025-06-16',
-      },
-      {
-        'title': 'Weekly Newsletter',
-        'subtitle': 'Your digest for the week is ready',
-        'type': 'News',
-        'submission_date': '2025-06-15',
-      },
-    ];
+    return _AdminNotificationScreenBody();
+  }
+}
 
+class _AdminNotificationScreenBody extends StatefulWidget {
+  @override
+  State<_AdminNotificationScreenBody> createState() =>
+      _AdminNotificationScreenBodyState();
+}
+
+class _AdminNotificationScreenBodyState
+    extends State<_AdminNotificationScreenBody> {
+  List<Map<String, dynamic>> notifications = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchNotifications();
+  }
+
+  Future<void> fetchNotifications() async {
+    try {
+      final fetchedNotifications = await SupabaseService.getAllNotifications();
+      setState(() {
+        notifications = fetchedNotifications;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
           const SizedBox(
@@ -66,7 +83,26 @@ class AdminNotificationScreen extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
-          NotificationCard.buildNotificationCards(notifications)
+          isLoading
+              ? const CircularProgressIndicator()
+              : NotificationCard.buildNotificationCards(
+                  notifications
+                      .map((n) => {
+                            'notification_id': n['notification_id'],
+                            'title': n['title'] ?? '',
+                            'subtitle': n['message'] ?? '',
+                            'type': n['type'] ?? '',
+                            'submission_date': n['schedule_date'] ?? '',
+                          })
+                      .toList(),
+                  onDelete: (int notificationId) async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    await SupabaseService.deleteNotification(notificationId);
+                    await fetchNotifications();
+                  },
+                ),
         ],
       ),
     );

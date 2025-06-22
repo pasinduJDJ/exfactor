@@ -1,15 +1,15 @@
+import 'package:exfactor/services/superbase_service.dart';
 import 'package:exfactor/utils/colors.dart';
 import 'package:exfactor/utils/validators.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../../utils/constants.dart';
 import '../../widgets/common/custom_button.dart';
-import '../../widgets/common/custom_text_field.dart';
-import '../../widgets/common/responsive_layout.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import '../../models/user_model.dart';
-import '../../services/firebase_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../../models/user_model.dart';
+import '../../models/emergency_contact_model.dart';
 
 class AddUserScreen extends StatefulWidget {
   const AddUserScreen({super.key});
@@ -22,10 +22,6 @@ class _AddUserScreenState extends State<AddUserScreen> {
   final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
-  final _userNameconroller = TextEditingController();
-  final _dobController = TextEditingController();
-  final _joinDateController = TextEditingController();
-  final _designationController = TextEditingController();
   final _emergencyContactNameController = TextEditingController();
   final _emergencyContactNumberController = TextEditingController();
   final _emergencyContactRelationController = TextEditingController();
@@ -53,86 +49,69 @@ class _AddUserScreenState extends State<AddUserScreen> {
     'IJKL'
   ];
 
-  @override
-
   // Validate and pass data into database
   Future<void> _handleSubmit() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    // Validate required fields
+    if (!_formKey.currentState!.validate()) {
+      _showToast('Please fill all required fields.');
+      return;
+    }
     if (_pickedImage == null) {
-      _showToast('Please select a profile image');
+      _showToast('Please select a profile image.');
       return;
     }
-
-    if (_selectedRole == 'Select Role') {
-      _showToast('Please select a role');
-      return;
-    }
-
-    if (_selectedSupervisor == 'Select Supervisor') {
-      _showToast('Please select a supervisor');
-      return;
-    }
-
-    if (_selectedDOB == null) {
-      _showToast('Please select date of birth');
-      return;
-    }
-
-    if (_selectedJoinDate == null) {
-      _showToast('Please select join date');
-      return;
-    }
-
-    if (_selectedDesignationDate == null) {
-      _showToast('Please select designation date');
-      return;
-    }
-
     setState(() => _isLoading = true);
-
     try {
-      // Upload profile image
-      final imageUrl = await FirebaseService.uploadProfileImage(_pickedImage!);
+      // 1. Sign up user in Supabase Auth
+      final signUpResponse = await SupabaseService.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      final user = signUpResponse.user;
+      if (user == null) {
+        throw Exception('User registration failed.');
+      }
+      final userId = int.tryParse(user.id.replaceAll(RegExp(r'[^0-9]'), '')) ??
+          DateTime.now().millisecondsSinceEpoch;
 
-      String? supervisorId = _selectedSupervisor != 'Select Supervisor'
-          ? _selectedSupervisor
-          : null;
+      // 2. Upload profile image (save storage path, not URL)
+      final fileName =
+          'profileimages/${userId}_${DateTime.now().millisecondsSinceEpoch}.png';
+      // Use the uploadProfileImage method, but only save the fileName (path) in DB
+      await SupabaseService.uploadProfileImage(
+          _pickedImage!, userId.toString());
+      final profileImagePath = fileName;
 
-      // Create user model
-      final user = UserModel(
+      // 3. Insert user metadata
+      final userModel = UserModel(
+        userId: userId,
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         email: _emailController.text.trim(),
-        contactNumber: _phoneController.text.trim(),
-        dob: _selectedDOB!,
+        mobile: _phoneController.text.trim(),
+        birthday: _selectedDOB!,
         joinDate: _selectedJoinDate!,
         designationDate: _selectedDesignationDate!,
         role: _selectedRole,
-        supervisorId: _selectedSupervisor,
-        profileImageUrl: imageUrl,
-        emergencyContact: {
-          'name': _emergencyContactNameController.text.trim(),
-          'number': _emergencyContactNumberController.text.trim(),
-          'relationship': _emergencyContactRelationController.text.trim(),
-        },
+        profileImage: profileImagePath,
+        supervisor: _selectedSupervisor,
       );
+      await SupabaseService.insertUserMetaData(userModel.toMap());
 
-      await FirebaseService.registerUser(user, _passwordController.text);
+      // 4. Insert emergency contact
+      final emergencyContact = EmergencyContact(
+        name: _emergencyContactNameController.text.trim(),
+        mobileNumber: _emergencyContactNumberController.text.trim(),
+        relationship: _emergencyContactRelationController.text.trim(),
+        uId: userId,
+      );
+      await SupabaseService.insertEmergencyContact(emergencyContact);
 
-      if (mounted) {
-        _showToast('User registered successfully!');
-        Navigator.pop(context);
-      }
+      _showToast('User created successfully!');
+      Navigator.of(context).pop();
     } catch (e) {
-      if (mounted) {
-        _showToast(e.toString());
-      }
+      _showToast('Error: ${e.toString()}');
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      setState(() => _isLoading = false);
     }
   }
 
@@ -157,8 +136,6 @@ class _AddUserScreenState extends State<AddUserScreen> {
               _buildTextField(_firstNameController, "Enter First Name"),
               const SizedBox(height: AppConstants.defaultSpacing * 2),
               _buildTextField(_lastNameController, "Enter Last Name"),
-              const SizedBox(height: AppConstants.defaultSpacing * 2),
-              _buildTextField(_userNameconroller, "Enter User Name"),
               const SizedBox(height: AppConstants.defaultSpacing * 2),
               _buildTextEmailField(_emailController, "Enter Email Address"),
               const SizedBox(height: AppConstants.defaultSpacing * 2),
@@ -249,6 +226,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                 onPressed: _handleSubmit,
                 isLoading: _isLoading,
               ),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
             ],
           ),
         ),
@@ -349,7 +327,15 @@ class _AddUserScreenState extends State<AddUserScreen> {
             borderSide: BorderSide.none),
         contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       ),
-      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+      validator: (val) {
+        if (val == null ||
+            val.isEmpty ||
+            val == 'Select Role' ||
+            val == 'Select Supervisor') {
+          return 'This field is required';
+        }
+        return null;
+      },
     );
   }
 

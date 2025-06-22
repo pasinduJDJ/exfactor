@@ -1,7 +1,6 @@
 import 'package:exfactor/screens/login_page.dart';
 import 'package:exfactor/utils/colors.dart';
 import 'package:flutter/material.dart';
-import '../../utils/constants.dart';
 import '../../widgets/common/custom_button.dart';
 
 class SupervisorProfileScreen extends StatefulWidget {

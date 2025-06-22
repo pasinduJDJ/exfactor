@@ -3,6 +3,7 @@ import 'package:exfactor/utils/colors.dart';
 import 'package:exfactor/widgets/common/custom_button.dart';
 import 'package:exfactor/widgets/user_card_view.dart';
 import 'package:flutter/material.dart';
+import 'package:exfactor/services/superbase_service.dart';
 
 class MangeUsers extends StatefulWidget {
   const MangeUsers({super.key});
@@ -12,26 +13,29 @@ class MangeUsers extends StatefulWidget {
 }
 
 class _MangeUsersState extends State<MangeUsers> {
-  final users = [
-    {
-      'name': 'Pasindu Dulanajana',
-      'email': 'dp@exfsys.com',
-      'role': 'QA & Mobile Technologie Associate',
-      'avatar': 'assets/avatars/pasindu.png',
-    },
-    {
-      'name': 'Kamith Iiyanage',
-      'email': 'kl@exfsys.com',
-      'role': 'Mobile Technologie Associate',
-      'avatar': 'assets/avatars/kamith.png',
-    },
-    {
-      'name': 'Harindu Yapa',
-      'email': 'hy@exfsys.com',
-      'role': 'QA Associate',
-      'avatar': 'assets/avatars/harindu.png',
-    },
-  ];
+  List<Map<String, dynamic>> users = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUsers();
+  }
+
+  Future<void> fetchUsers() async {
+    try {
+      final fetchedUsers = await SupabaseService.getAllUsers();
+      setState(() {
+        users = fetchedUsers;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -66,7 +70,20 @@ class _MangeUsersState extends State<MangeUsers> {
               ),
             ],
           ),
-          UserCard.buildUserGridCard(users),
+          isLoading
+              ? const CircularProgressIndicator()
+              : UserCard.buildUserGridCard(
+                  users
+                      .map((u) => {
+                            'id': u['id']?.toString() ?? '',
+                            'name':
+                                '${u['first_name'] ?? ''} ${u['last_name'] ?? ''}',
+                            'email': u['email']?.toString() ?? '',
+                            'role': u['role']?.toString() ?? '',
+                            'avatar': u['profile_image']?.toString() ?? '',
+                          } as Map<String, String>)
+                      .toList(),
+                ),
         ],
       ),
     );

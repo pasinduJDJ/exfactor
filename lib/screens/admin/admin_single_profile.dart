@@ -2,87 +2,140 @@ import 'package:exfactor/widgets/common/custom_app_bar_with_icon.dart';
 import 'package:exfactor/widgets/common/custom_button.dart';
 import 'package:flutter/material.dart';
 import '../../utils/colors.dart';
+import 'package:exfactor/services/superbase_service.dart';
 
-class AdminSingleProfileScreen extends StatelessWidget {
-  final Map<String, String> user;
+class AdminSingleProfileScreen extends StatefulWidget {
+  final String userId;
 
-  const AdminSingleProfileScreen({Key? key, required this.user})
+  const AdminSingleProfileScreen({Key? key, required this.userId})
       : super(key: key);
 
   @override
+  State<AdminSingleProfileScreen> createState() =>
+      _AdminSingleProfileScreenState();
+}
+
+class _AdminSingleProfileScreenState extends State<AdminSingleProfileScreen> {
+  Map<String, dynamic>? user;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUser();
+  }
+
+  Future<void> fetchUser() async {
+    try {
+      final userIdInt = int.tryParse(widget.userId);
+      if (userIdInt == null) {
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+      final userData = await SupabaseService.getUserProfile(userIdInt);
+      setState(() {
+        user = userData;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final user = {
-      'name': 'Pasindu Dulanajana',
-      'email': 'dp@exfsys.com',
-      'mobile': '076 706 6455',
-      'dob': '2000-10-25',
-      'joined': '2025-01-01',
-      'designation': '2026-01-01',
-      'supervisor': 'Chumley D.',
-      'permission': 'Technical User',
-      'emergencyName': 'Pathirage Jayawardena',
-      'emergencyRelation': 'Father',
-      'emergencyNumber': '076 707 7546',
-      'avatar': 'assets/images/avatar.png',
-    };
     return Scaffold(
       backgroundColor: KbgColor,
-      appBar:
-          CustomAppBarWithIcon(icon: Icons.person, title: "Pasindu Dulanajana"),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      radius: 75,
-                      backgroundImage: AssetImage(user['avatar']!),
-                    ),
-                    const SizedBox(height: 16),
-                    _infoRow('Full Name', user['name']!),
-                    _infoRow('Email Adress', user['email']!),
-                    _infoRow('Mobile Number', user['mobile']!),
-                    _infoRow('Date of Birth', user['dob']!),
-                    _infoRow('Joined Date', user['joined']!),
-                    _infoRow('Designation', user['designation']!),
-                    _infoRow('Supervisor', user['supervisor']!),
-                    _infoRow('Permission Type', user['permission']!),
-                    const SizedBox(height: 10),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Emergency Contact..',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    _infoRow('Full Name', user['emergencyName']!),
-                    _infoRow('Relationship', user['emergencyRelation']!),
-                    _infoRow('Contact number', user['emergencyNumber']!),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    CustomButton(
-                      text: "Remove Member",
-                      onPressed: () {},
-                      backgroundColor: cardDarkRed,
-                      width: double.infinity / 2,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+      appBar: CustomAppBarWithIcon(
+        icon: Icons.person,
+        title: user != null
+            ? "${user!['first_name'] ?? ''} ${user!['last_name'] ?? ''}"
+            : "User Profile",
       ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : user == null
+              ? const Center(child: Text('User not found'))
+              : Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Card(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                        elevation: 4,
+                        child: Padding(
+                          padding: const EdgeInsets.all(18),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              CircleAvatar(
+                                radius: 75,
+                                backgroundImage:
+                                    (user!['profile_image'] != null &&
+                                            user!['profile_image']
+                                                .toString()
+                                                .isNotEmpty)
+                                        ? (user!['profile_image']
+                                                    .toString()
+                                                    .startsWith('http')
+                                                ? NetworkImage(
+                                                    user!['profile_image'])
+                                                : AssetImage(
+                                                    user!['profile_image']))
+                                            as ImageProvider
+                                        : null,
+                                child: (user!['profile_image'] == null ||
+                                        user!['profile_image']
+                                            .toString()
+                                            .isEmpty)
+                                    ? const Icon(Icons.person_outline, size: 30)
+                                    : null,
+                              ),
+                              const SizedBox(height: 16),
+                              _infoRow('Full Name',
+                                  "${user!['first_name'] ?? ''} ${user!['last_name'] ?? ''}"),
+                              _infoRow('Email Address', user!['email'] ?? ''),
+                              _infoRow('Mobile Number', user!['mobile'] ?? ''),
+                              _infoRow(
+                                  'Date of Birth', user!['birthday'] ?? ''),
+                              _infoRow('Joined Date', user!['joindate'] ?? ''),
+                              _infoRow(
+                                  'Designation', user!['designation'] ?? ''),
+                              _infoRow('Supervisor', user!['supervisor'] ?? ''),
+                              _infoRow('Permission Type', user!['role'] ?? ''),
+                              const SizedBox(height: 10),
+                              // Emergency contact fields if available
+                              if (user!['emergency_name'] != null)
+                                _infoRow('Emergency Name',
+                                    user!['emergency_name'] ?? ''),
+                              if (user!['emergency_relation'] != null)
+                                _infoRow('Relationship',
+                                    user!['emergency_relation'] ?? ''),
+                              if (user!['emergency_number'] != null)
+                                _infoRow('Contact number',
+                                    user!['emergency_number'] ?? ''),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              CustomButton(
+                                text: "Remove Member",
+                                onPressed: () {},
+                                backgroundColor: cardDarkRed,
+                                width: double.infinity / 2,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
     );
   }
 
