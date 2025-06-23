@@ -46,7 +46,7 @@ class _SupervisorMainScreenState extends State<SupervisorMainScreen> {
       SupervisorHome(user: widget.user),
       const SupervisorTaskScreen(),
       const SupervisorNotification(),
-      const SupervisorProfileScreen(),
+      SupervisorProfileScreen(user: widget.user),
     ];
   }
 
@@ -69,8 +69,8 @@ class _SupervisorMainScreenState extends State<SupervisorMainScreen> {
   @override
   Widget build(BuildContext context) {
     return BaseLayout(
-      title: 'Supervisor Dashboard',
-      subtitle: 'Manage your team',
+      title: "${widget.user.firstName}",
+      subtitle: widget.user.position,
       profileImage: 'assets/images/man-avatar.png',
       onProfileTap: () {
         // TODO: Implement profile action

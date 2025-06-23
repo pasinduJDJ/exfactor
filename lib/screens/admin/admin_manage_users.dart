@@ -1,3 +1,4 @@
+import 'package:exfactor/models/user_model.dart';
 import 'package:exfactor/screens/admin/admin_add_user.dart';
 import 'package:exfactor/utils/colors.dart';
 import 'package:exfactor/widgets/common/custom_button.dart';
@@ -39,7 +40,7 @@ class _MangeUsersState extends State<MangeUsers> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: 15),
       child: Column(
         children: [
           const SizedBox(
@@ -79,7 +80,7 @@ class _MangeUsersState extends State<MangeUsers> {
                             'name':
                                 '${u['first_name'] ?? ''} ${u['last_name'] ?? ''}',
                             'email': u['email']?.toString() ?? '',
-                            'role': u['role']?.toString() ?? '',
+                            'role': u['position']?.toString() ?? '',
                             'avatar': u['profile_image']?.toString() ?? '',
                           } as Map<String, String>)
                       .toList(),

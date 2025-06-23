@@ -21,6 +21,7 @@ class _AdminHomeState extends State<AdminHome> {
   bool showProgress = true;
   bool showOverdue = false;
   bool showComplete = false;
+  bool showOverDueTask = false;
 
   int liveProjectCount = 0;
   int overdueTaskCount = 0;
@@ -31,6 +32,7 @@ class _AdminHomeState extends State<AdminHome> {
   List<Map<String, dynamic>> liveProjects = [];
   List<Map<String, dynamic>> onProgressTask = [];
   List<Map<String, dynamic>> teamMembers = [];
+  List<Map<String, dynamic>> overDueTask = [];
 
   @override
   void initState() {
@@ -79,7 +81,11 @@ class _AdminHomeState extends State<AdminHome> {
       return status == 'on progress' || status == 'progress';
     }).toList();
 
-    // Get live projects
+    overDueTask = tasks.where((t) {
+      final status = (t['status'] ?? '').toString().toLowerCase();
+      return status == 'overdue';
+    }).toList();
+
     liveProjects = projects.where((p) {
       final status = (p['status'] ?? '').toString().toLowerCase();
       return status == 'on progress' || status == 'progress';
@@ -112,7 +118,7 @@ class _AdminHomeState extends State<AdminHome> {
       },
     ];
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(children: [
         const SizedBox(height: 30),
         isLoadingSummary
@@ -131,6 +137,25 @@ class _AdminHomeState extends State<AdminHome> {
               MaterialPageRoute(
                 builder: (context) => AdminSingleProjectScreen(
                     projectId: project['project_id']?.toString() ?? ''),
+              ),
+            );
+          },
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        UserUtils.buildExpandableGroup(
+          title: "OverDue Task",
+          color: cardDarkRed,
+          expanded: showOverDueTask,
+          onToggle: () => setState(() => showOverDueTask = !showOverDueTask),
+          groupList: overDueTask,
+          onSeeMore: (task) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AdminSingleProjectScreen(
+                    projectId: task['task_id']?.toString() ?? ''),
               ),
             );
           },
@@ -222,7 +247,8 @@ class _AdminHomeState extends State<AdminHome> {
                                     MaterialPageRoute(
                                       builder: (context) =>
                                           AdminSingleProfileScreen(
-                                        userId: user['id']?.toString() ?? '',
+                                        userEmail:
+                                            user['email']?.toString() ?? '',
                                       ),
                                     ),
                                   );

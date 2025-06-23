@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../models/user_model.dart';
-import 'package:exfactor/services/superbase_auth.dart';
+import '../../services/superbase_auth.dart';
 
 class AddUserScreen extends StatefulWidget {
   const AddUserScreen({super.key});
@@ -27,6 +27,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _positionController = TextEditingController();
+  final _memberIdController = TextEditingController();
   String _selectedRole = 'Select Role';
   String _selectedSupervisor = "Select Supervisor";
   bool _isLoading = false;
@@ -54,15 +56,32 @@ class _AddUserScreenState extends State<AddUserScreen> {
       _showToast('Please fill all required fields.');
       return;
     }
+    if (_selectedDOB == null ||
+        _selectedJoinDate == null ||
+        _selectedDesignationDate == null) {
+      _showToast('Please select all dates.');
+      return;
+    }
+    if (_selectedRole == 'Select Role') {
+      _showToast('Please select a role.');
+      return;
+    }
+    if (_selectedSupervisor == 'Select Supervisor') {
+      _showToast('Please select a supervisor.');
+      return;
+    }
     if (_pickedImage == null) {
       _showToast('Please select a profile image.');
       return;
     }
+    if (_passwordController.text.trim().isEmpty) {
+      _showToast('Please enter a password.');
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
-      // 1. Prepare user model (without userId and profileImage for now)
-      final userModel = UserModel(
-        userId: null, // will be set after Auth registration
+      final user = UserModel(
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         email: _emailController.text.trim(),
@@ -71,29 +90,25 @@ class _AddUserScreenState extends State<AddUserScreen> {
         joinDate: _selectedJoinDate!,
         designationDate: _selectedDesignationDate!,
         role: _selectedRole,
-        profileImage: '', // will be set after image upload
+        profileImage: '', // will be set after upload
         supervisor: _selectedSupervisor,
         emergencyName: _emergencyContactNameController.text.trim(),
         emergencyMobileNumber: _emergencyContactNumberController.text.trim(),
         emergencyRelationship: _emergencyContactRelationController.text.trim(),
+        position: _positionController.text.trim(),
+        memberId: int.tryParse(_memberIdController.text.trim()) ?? 0,
       );
-
-      // 2. Register user (handles Auth, image upload, and user table insert)
       final result = await SuperbaseAuth.registerUser(
-        email: _emailController.text.trim(),
+        user: user,
+        imageFile: _pickedImage,
         password: _passwordController.text.trim(),
-        userModel: userModel,
-        profileImageFile: _pickedImage!,
       );
-
+      _showToast(result['message'] ?? 'Unknown result');
       if (result['success'] == true) {
-        _showToast('User created successfully!');
         Navigator.of(context).pop();
-      } else {
-        _showToast('Error: \\${result['message']}');
       }
     } catch (e) {
-      _showToast('Error: \\${e.toString()}');
+      _showToast('Registration failed: ${e.toString()}');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -117,6 +132,9 @@ class _AddUserScreenState extends State<AddUserScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              _buildTextField(
+                  _memberIdController, "Enter Employee Register Number"),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
               _buildTextField(_firstNameController, "Enter First Name"),
               const SizedBox(height: AppConstants.defaultSpacing * 2),
               _buildTextField(_lastNameController, "Enter Last Name"),
@@ -124,6 +142,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
               _buildTextEmailField(_emailController, "Enter Email Address"),
               const SizedBox(height: AppConstants.defaultSpacing * 2),
               _buildNumberField(_phoneController, "Enter Contact Number"),
+              const SizedBox(height: AppConstants.defaultSpacing * 2),
+              _buildTextField(_positionController, "Enter Current Position"),
               const SizedBox(height: AppConstants.defaultSpacing * 2),
               _buildDOBDateField("Select Date Of Birth", _selectedDOB,
                   (pickedDate) {

@@ -54,7 +54,7 @@ class UserCard {
                                 MaterialPageRoute(
                                   builder: (context) =>
                                       AdminSingleProfileScreen(
-                                          userId: u['id'] ?? ''),
+                                          userEmail: u['email'] ?? ''),
                                 ),
                               );
                             },

@@ -25,9 +25,9 @@ class _TechnicalMainScreenState extends State<TechnicalMainScreen> {
     super.initState();
     _screens = [
       TechnicalHome(user: widget.user),
-      const TaskTrackingBody(),
+      TaskTrackingBody(user: widget.user),
       const TechnicalReportScreen(),
-      const TechnicalProfileScreen(),
+      TechnicalProfileScreen(user: widget.user),
     ];
   }
 
@@ -69,8 +69,8 @@ class _TechnicalMainScreenState extends State<TechnicalMainScreen> {
   @override
   Widget build(BuildContext context) {
     return BaseLayout(
-      title: 'Technical Dashboard',
-      subtitle: 'Manage your tasks',
+      title: widget.user.firstName,
+      subtitle: widget.user.position,
       profileImage: 'assets/images/man-avatar.png',
       onProfileTap: () {},
       body: _screens[_currentIndex],

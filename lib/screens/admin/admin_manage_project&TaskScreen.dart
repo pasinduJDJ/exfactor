@@ -204,7 +204,7 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: EdgeInsets.symmetric(horizontal: 15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,

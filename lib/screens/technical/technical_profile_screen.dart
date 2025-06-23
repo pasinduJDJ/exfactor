@@ -1,10 +1,13 @@
+import 'package:exfactor/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:exfactor/screens/login_page.dart';
 import 'package:exfactor/utils/colors.dart';
 import '../../widgets/common/custom_button.dart';
 
 class TechnicalProfileScreen extends StatefulWidget {
-  const TechnicalProfileScreen({Key? key}) : super(key: key);
+  final UserModel user;
+  const TechnicalProfileScreen({Key? key, required this.user})
+      : super(key: key);
 
   @override
   State<TechnicalProfileScreen> createState() => _TechnicalProfileScreenState();
@@ -13,22 +16,6 @@ class TechnicalProfileScreen extends StatefulWidget {
 class _TechnicalProfileScreenState extends State<TechnicalProfileScreen> {
   @override
   Widget build(BuildContext context) {
-    final user = {
-      'firstName': 'Pasindu',
-      'lastName': 'Dulanajana',
-      'email': 'dp@exfsys.com',
-      'mobile': '076 706 6455',
-      'dob': '2000-10-25',
-      'joined': '2025-06-02',
-      'designation': '2026-06-02',
-      'supervisor': 'Chumley D',
-      'position': 'Technical User',
-      'emergencyName': 'Pathirage Jayawardena',
-      'emergencyRelation': 'Father',
-      'emergencyNumber': '0718029038',
-      'avatar': 'assets/images/avatar.png',
-    };
-
     return Scaffold(
       backgroundColor: const Color(0xFFDCEAF5),
       body: SingleChildScrollView(
@@ -36,11 +23,11 @@ class _TechnicalProfileScreenState extends State<TechnicalProfileScreen> {
           children: [
             const SizedBox(height: 16),
 
-            // Avatar
+            //Avatar
             CircleAvatar(
               radius: 70,
               backgroundColor: Colors.white,
-              backgroundImage: AssetImage(user['avatar']!),
+              backgroundImage: AssetImage(widget.user.profileImage),
             ),
 
             const SizedBox(height: 16),
@@ -51,21 +38,22 @@ class _TechnicalProfileScreenState extends State<TechnicalProfileScreen> {
               child: Column(
                 children: [
                   _infoCard({
-                    'First Name': user['firstName']!,
-                    'Last Name': user['lastName']!,
-                    'Email Address': user['email']!,
-                    'Mobile Number': user['mobile']!,
-                    'Date Of Birth': user['dob']!,
-                    'Join Date': user['joined']!,
-                    'Designation Date': user['designation']!,
-                    'Supervisor': user['supervisor']!,
-                    'Position': user['position']!,
+                    'First Name': widget.user.firstName,
+                    'Last Name': widget.user.lastName,
+                    'Position': widget.user.position,
+                    'Email Address': widget.user.email,
+                    'Mobile Number': widget.user.mobile,
+                    'Date Of Birth': widget.user.birthday.toString(),
+                    'Join Date': widget.user.joinDate.toString(),
+                    'Designation Date': widget.user.designationDate.toString(),
+                    'Supervisor': widget.user.supervisor ?? '',
+                    'Position': widget.user.position,
                   }),
                   const SizedBox(height: 16),
                   _infoCard({
-                    'Name': user['emergencyName']!,
-                    'Contact Number': user['emergencyNumber']!,
-                    'Relationship': user['emergencyRelation']!,
+                    'Name': widget.user.emergencyName,
+                    'Contact Number': widget.user.emergencyMobileNumber,
+                    'Relationship': widget.user.emergencyRelationship,
                   }),
                   const SizedBox(height: 16),
                   CustomButton(
@@ -89,7 +77,6 @@ class _TechnicalProfileScreenState extends State<TechnicalProfileScreen> {
                 ],
               ),
             ),
-            // Buttons
           ],
         ),
       ),

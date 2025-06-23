@@ -5,9 +5,9 @@ import '../../utils/colors.dart';
 import 'package:exfactor/services/superbase_service.dart';
 
 class AdminSingleProfileScreen extends StatefulWidget {
-  final String userId;
+  final String userEmail;
 
-  const AdminSingleProfileScreen({Key? key, required this.userId})
+  const AdminSingleProfileScreen({Key? key, required this.userEmail})
       : super(key: key);
 
   @override
@@ -27,14 +27,15 @@ class _AdminSingleProfileScreenState extends State<AdminSingleProfileScreen> {
 
   Future<void> fetchUser() async {
     try {
-      final userIdInt = int.tryParse(widget.userId);
-      if (userIdInt == null) {
+      final userEmail = widget.userEmail;
+      if (userEmail == null) {
         setState(() {
           isLoading = false;
         });
         return;
       }
-      final userData = await SupabaseService.getUserProfile(userIdInt);
+      final userData = await SupabaseService.getUserByEmail(userEmail);
+      print('Fetched user data: ' + userData.toString());
       setState(() {
         user = userData;
         isLoading = false;
@@ -131,7 +132,7 @@ class _AdminSingleProfileScreenState extends State<AdminSingleProfileScreen> {
                                   });
                                   try {
                                     final userIdInt =
-                                        int.tryParse(widget.userId);
+                                        int.tryParse(user!['id'].toString());
                                     if (userIdInt != null) {
                                       await SupabaseService
                                           .deleteEmergencyContactsByUserId(

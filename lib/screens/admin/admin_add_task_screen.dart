@@ -189,54 +189,15 @@ class _AdminAddTaskScreenState extends State<AdminAddTaskScreen> {
 
   Widget _buildTextField(TextEditingController? controller, String hint,
       {bool enabled = true, Widget? suffix}) {
-    return TextFormField(
-      controller: controller,
-      enabled: enabled,
-      decoration: InputDecoration(
-        hintText: hint,
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-        suffixIcon: suffix,
-      ),
-      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
-    );
-  }
-
-  Widget _buildProjectDropdown(String hint, List<Map<String, dynamic>> items,
-      String? value, ValueChanged<String?> onChanged) {
-    return DropdownButtonFormField<String>(
-      value: value,
-      hint: Text(hint),
-      items: items
-          .map((e) => DropdownMenuItem(
-              value: '${e['title']} (ID: ${e['project_id']})',
-              child: Text('${e['title']} (ID: ${e['project_id']})')))
-          .toList(),
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none),
-        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-      ),
-      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
-    );
-  }
-
-  Widget _buildDateField(String label, DateTime? date, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AbsorbPointer(
-        child: TextFormField(
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(hint),
+        TextFormField(
+          controller: controller,
+          enabled: enabled,
           decoration: InputDecoration(
-            hintText: label,
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(
@@ -244,15 +205,74 @@ class _AdminAddTaskScreenState extends State<AdminAddTaskScreen> {
                 borderSide: BorderSide.none),
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-            suffixIcon: const Icon(Icons.calendar_today, size: 20),
+            suffixIcon: suffix,
           ),
-          controller: TextEditingController(
-              text: date == null
-                  ? ''
-                  : '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}'),
           validator: (val) => val == null || val.isEmpty ? 'Required' : null,
-        ),
-      ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildProjectDropdown(String hint, List<Map<String, dynamic>> items,
+      String? value, ValueChanged<String?> onChanged) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(hint),
+        DropdownButtonFormField<String>(
+          value: value,
+          items: items
+              .map((e) => DropdownMenuItem(
+                  value: '${e['title']} (ID: ${e['project_id']})',
+                  child: Text('${e['title']} (ID: ${e['project_id']})')))
+              .toList(),
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+          ),
+          validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+        )
+      ],
+    );
+  }
+
+  Widget _buildDateField(String label, DateTime? date, VoidCallback onTap) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label),
+        GestureDetector(
+          onTap: onTap,
+          child: AbsorbPointer(
+            child: TextFormField(
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                suffixIcon: const Icon(Icons.calendar_today, size: 20),
+              ),
+              controller: TextEditingController(
+                  text: date == null
+                      ? ''
+                      : '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}'),
+              validator: (val) =>
+                  val == null || val.isEmpty ? 'Required' : null,
+            ),
+          ),
+        )
+      ],
     );
   }
 
@@ -280,7 +300,7 @@ class _AdminAddTaskScreenState extends State<AdminAddTaskScreen> {
                     runSpacing: 4,
                     children: selectedMembers.map((memberId) {
                       final member = items.firstWhere(
-                        (item) => item['id'].toString() == memberId,
+                        (item) => item['member_id'].toString() == memberId,
                         orElse: () =>
                             {'first_name': 'Unknown', 'last_name': 'Member'},
                       );
@@ -310,7 +330,7 @@ class _AdminAddTaskScreenState extends State<AdminAddTaskScreen> {
                       .where((item) =>
                           !selectedMembers.contains(item['id'].toString()))
                       .map((item) => DropdownMenuItem(
-                            value: item['id'].toString(),
+                            value: item['member_id'].toString(),
                             child: Text(
                                 '${item['first_name']} ${item['last_name']}'),
                           ))

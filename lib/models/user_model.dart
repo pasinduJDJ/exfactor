@@ -13,23 +13,26 @@ class UserModel {
   final String emergencyName;
   final String emergencyMobileNumber;
   final String emergencyRelationship;
+  final String position;
+  final int memberId;
 
-  UserModel({
-    this.userId,
-    required this.firstName,
-    required this.lastName,
-    required this.email,
-    required this.mobile,
-    required this.birthday,
-    required this.joinDate,
-    required this.designationDate,
-    required this.role,
-    required this.profileImage,
-    this.supervisor,
-    required this.emergencyName,
-    required this.emergencyMobileNumber,
-    required this.emergencyRelationship,
-  });
+  UserModel(
+      {this.userId,
+      required this.firstName,
+      required this.lastName,
+      required this.email,
+      required this.mobile,
+      required this.birthday,
+      required this.joinDate,
+      required this.designationDate,
+      required this.role,
+      required this.profileImage,
+      this.supervisor,
+      required this.emergencyName,
+      required this.emergencyMobileNumber,
+      required this.emergencyRelationship,
+      required this.position,
+      required this.memberId});
 
   Map<String, dynamic> toMap() {
     return {
@@ -47,6 +50,8 @@ class UserModel {
       'emergency_name': emergencyName,
       'emergency_number': emergencyMobileNumber,
       'emergency_relationship': emergencyRelationship,
+      'position': position,
+      'member_id': memberId
     };
   }
 
@@ -66,6 +71,8 @@ class UserModel {
       emergencyName: map['emergency_name'] ?? '',
       emergencyMobileNumber: map['emergency_number'] ?? '',
       emergencyRelationship: map['emergency_relationship'] ?? '',
+      position: map['position'] ?? '',
+      memberId: map['member_id'] ?? '',
     );
   }
 
@@ -84,6 +91,8 @@ class UserModel {
     String? emergencyName,
     String? emergencyMobileNumber,
     String? emergencyRelationship,
+    String? position,
+    int? memberId,
   }) {
     return UserModel(
       userId: userId ?? this.userId,
@@ -102,6 +111,8 @@ class UserModel {
           emergencyMobileNumber ?? this.emergencyMobileNumber,
       emergencyRelationship:
           emergencyRelationship ?? this.emergencyRelationship,
+      position: position ?? this.position,
+      memberId: memberId ?? this.memberId,
     );
   }
 }

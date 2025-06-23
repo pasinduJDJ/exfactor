@@ -1,10 +1,13 @@
+import 'package:exfactor/models/user_model.dart';
 import 'package:exfactor/screens/login_page.dart';
 import 'package:exfactor/utils/colors.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/common/custom_button.dart';
 
 class SupervisorProfileScreen extends StatefulWidget {
-  const SupervisorProfileScreen({Key? key}) : super(key: key);
+  final UserModel user;
+  const SupervisorProfileScreen({Key? key, required this.user})
+      : super(key: key);
 
   @override
   State<SupervisorProfileScreen> createState() =>
@@ -12,77 +15,55 @@ class SupervisorProfileScreen extends StatefulWidget {
 }
 
 class _SupervisorProfileScreenState extends State<SupervisorProfileScreen> {
-  final user = {
-    'name': 'Pasindu Dulanajana',
-    'email': 'dp@exfsys.com',
-    'mobile': '076 706 6455',
-    'dob': '2000-10-25',
-    'joined': '2025-01-01',
-    'designation': '2026-01-01',
-    'supervisor': 'Chumley D.',
-    'permission': 'Technical User',
-    'emergencyName': 'Pathirage Jayawardena',
-    'emergencyRelation': 'Father',
-    'emergencyNumber': '076 707 7546',
-    'avatar': 'assets/images/avatar.png',
-  };
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F9FB),
-      body: Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-          width: 340,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: const [
-              BoxShadow(
-                  color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircleAvatar(
-                radius: 75,
-                backgroundImage: AssetImage(user['avatar']!),
-              ),
-              const SizedBox(height: 20),
-              _buildInfoRow('Full Name', user['name']!),
-              _buildInfoRow('Email Adress', user['email']!),
-              _buildInfoRow('Mobile Number', user['mobile']!),
-              _buildInfoRow('Date of Birth', user['dob']!),
-              _buildInfoRow('Joined Date', user['joined']!),
-              _buildInfoRow('Designation', user['designation']!),
-              _buildInfoRow('Supervisor', user['supervisor']!),
-              _buildInfoRow('Permission Type', user['permission']!),
-              const SizedBox(height: 10),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Emergency Contact..',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(height: 6),
-              _buildInfoRow('Full Name', user['emergencyName']!),
-              _buildInfoRow('Relationship', user['emergencyRelation']!),
-              _buildInfoRow('Contact number', user['emergencyNumber']!),
-              const SizedBox(height: 20),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+      backgroundColor: const Color(0xFFDCEAF5),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+
+            //Avatar
+            CircleAvatar(
+              radius: 70,
+              backgroundColor: Colors.white,
+              backgroundImage: AssetImage(widget.user.profileImage),
+            ),
+
+            const SizedBox(height: 16),
+
+            // User Info Card
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
                 children: [
+                  _infoCard({
+                    'First Name': widget.user.firstName,
+                    'Last Name': widget.user.lastName,
+                    'Position': widget.user.position,
+                    'Email Address': widget.user.email,
+                    'Mobile Number': widget.user.mobile,
+                    'Date Of Birth': widget.user.birthday.toString(),
+                    'Join Date': widget.user.joinDate.toString(),
+                    'Designation Date': widget.user.designationDate.toString(),
+                    'Supervisor': widget.user.supervisor ?? '',
+                    'Position': widget.user.position,
+                  }),
+                  const SizedBox(height: 16),
+                  _infoCard({
+                    'Name': widget.user.emergencyName,
+                    'Contact Number': widget.user.emergencyMobileNumber,
+                    'Relationship': widget.user.emergencyRelationship,
+                  }),
+                  const SizedBox(height: 16),
                   CustomButton(
                     text: "Update",
                     onPressed: () {},
                     backgroundColor: cardGreen,
-                    width: double.infinity / 2,
+                    width: double.infinity,
                   ),
-                  const SizedBox(
-                    height: 8,
-                  ),
+                  const SizedBox(height: 5),
                   CustomButton(
                     text: "Log Out",
                     onPressed: () {
@@ -91,29 +72,73 @@ class _SupervisorProfileScreenState extends State<SupervisorProfileScreen> {
                       }));
                     },
                     backgroundColor: cardRed,
-                    width: double.infinity / 2,
+                    width: double.infinity,
                   ),
+                  const SizedBox(height: 16),
                 ],
-              )
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-              flex: 4,
-              child: Text('$label :',
-                  style: const TextStyle(fontWeight: FontWeight.w500))),
-          Expanded(flex: 6, child: Text(value)),
+  // Helper Widget to create info card
+  Widget _infoCard(Map<String, String> infoMap) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
         ],
+      ),
+      child: Column(
+        children: infoMap.entries.map((entry) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        entry.key,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 5,
+                      child: Text(
+                        entry.value,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(thickness: 1),
+            ],
+          );
+        }).toList(),
       ),
     );
   }

@@ -48,7 +48,7 @@ class _AdminNotificationScreenBodyState
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: 15),
       child: Column(
         children: [
           const SizedBox(

@@ -1,16 +1,51 @@
-# exfactor
+# EXFACTOR Mobile App
 
-A new Flutter project.
+## Project Handover (June 2024)
+
+This project has been cleaned and is ready for handover.
+
+### Clean-up Performed
+- All debug prints and unnecessary comments have been removed.
+- The `build/` directory and other generated files have been deleted.
+- The codebase has been analyzed and linter warnings have been minimized.
+- Unused imports and variables have been cleaned up where possible.
+- The project is ready for further development or deployment.
+
+---
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Prerequisites
+- [Flutter SDK](https://flutter.dev/docs/get-started/install) (latest stable)
+- Dart (comes with Flutter)
+- A device or emulator for Android/iOS/Web
 
-A few resources to get you started if this is your first Flutter project:
+### Setup
+1. **Clone the repository:**
+   ```sh
+   git clone <repo-url>
+   cd exfactor
+   ```
+2. **Install dependencies:**
+   ```sh
+   flutter pub get
+   ```
+3. **Run the app:**
+   ```sh
+   flutter run
+   ```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Directory Structure
+- `lib/` - Main Dart source code
+- `assets/` - Images and other assets
+- `android/`, `ios/`, `web/`, `macos/`, `linux/`, `windows/` - Platform-specific code
+- `test/` - Unit and widget tests
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Notes
+- Make sure to set up any required environment variables or API keys (not included in this repo).
+- For any issues, run `flutter analyze` to check for code quality.
+
+---
+
+## Contact
+For any questions, please contact the development team.
