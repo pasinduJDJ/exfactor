@@ -5,9 +5,11 @@ import '../../widgets/common/base_layout.dart';
 import 'supervisor_home.dart';
 import 'supervisor_task_screen.dart';
 import 'supervisor_profile_screen.dart';
+import 'package:exfactor/models/user_model.dart';
 
 class SupervisorMainScreen extends StatefulWidget {
-  const SupervisorMainScreen({super.key}); 
+  final UserModel user;
+  const SupervisorMainScreen({Key? key, required this.user}) : super(key: key);
 
   @override
   State<SupervisorMainScreen> createState() => _SupervisorMainScreenState();
@@ -16,12 +18,7 @@ class SupervisorMainScreen extends StatefulWidget {
 class _SupervisorMainScreenState extends State<SupervisorMainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const SupervisorHome(),
-    const SupervisorTaskScreen(),
-    const SupervisorNotification(),
-    const SupervisorProfileScreen(),
-  ];
+  late final List<Widget> _screens;
 
   final List<BottomNavigationBarItem> _navigationItems = const [
     BottomNavigationBarItem(
@@ -41,6 +38,17 @@ class _SupervisorMainScreenState extends State<SupervisorMainScreen> {
       label: 'Profile',
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      SupervisorHome(user: widget.user),
+      const SupervisorTaskScreen(),
+      const SupervisorNotification(),
+      const SupervisorProfileScreen(),
+    ];
+  }
 
   PreferredSizeWidget? _getCustomAppBar() {
     switch (_currentIndex) {

@@ -61,68 +61,94 @@ class UserUtils {
     );
   }
 
-  // Expandeble Group Widget
-  // static Widget buildExpandableGroup(
-  //     String title,
-  //     Color color,
-  //     bool expanded,
-  //     VoidCallback onToggle,
-  //     List<Task> groupTasks,
-  //     ValueChanged<Task> onSeeMore) {
-  //   return Card(
-  //     elevation: 3,
-  //     child: Column(
-  //       children: [
-  //         GestureDetector(
-  //           onTap: onToggle,
-  //           child: Container(
-  //             width: double.infinity,
-  //             decoration: BoxDecoration(
-  //               color: color,
-  //               borderRadius: BorderRadius.circular(12),
-  //             ),
-  //             padding: const EdgeInsets.all(12),
-  //             child: Row(
-  //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //               children: [
-  //                 Text(title,
-  //                     style:
-  //                         const TextStyle(color: Colors.white, fontSize: 14)),
-  //                 Icon(
-  //                   expanded
-  //                       ? Icons.keyboard_arrow_up
-  //                       : Icons.keyboard_arrow_down,
-  //                   color: Colors.white,
-  //                 )
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //         AnimatedCrossFade(
-  //           duration: const Duration(milliseconds: 300),
-  //           firstChild: Container(),
-  //           secondChild: ListView.builder(
-  //             shrinkWrap: true,
-  //             physics: const NeverScrollableScrollPhysics(),
-  //             itemCount: groupTasks.length,
-  //             itemBuilder: (context, index) {
-  //               final task = groupTasks[index];
-  //               return ListTile(
-  //                 title: Text(task.title),
-  //                 trailing: TextButton(
-  //                   onPressed: () => onSeeMore(task),
-  //                   child: const Text("See more.."),
-  //                 ),
-  //               );
-  //             },
-  //           ),
-  //           crossFadeState:
-  //               expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
+  //Expandeble Group Widget
+  static Widget buildExpandableGroup({
+    required String title,
+    required Color color,
+    required bool expanded,
+    required VoidCallback onToggle,
+    required List<Map<String, dynamic>> groupList,
+    required void Function(Map<String, dynamic>) onSeeMore,
+  }) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: onToggle,
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12), bottom: Radius.circular(12)),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
+                ),
+                Icon(
+                  expanded
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+          ),
+        ),
+        AnimatedCrossFade(
+          duration: const Duration(milliseconds: 300),
+          crossFadeState:
+              expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          firstChild: const SizedBox.shrink(),
+          secondChild: Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
+              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: groupList.isEmpty
+                ? const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('No items.'),
+                  )
+                : Column(
+                    children: groupList
+                        .map((item) => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      item['title'] ?? '',
+                                      style: const TextStyle(fontSize: 15),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => onSeeMore(item),
+                                    child: const Text('See more ..'),
+                                  ),
+                                ],
+                              ),
+                            ))
+                        .toList(),
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
 
   //Static Group weight
   // static Widget buildGroup(String title, Color color, List<Task> groupTasks,

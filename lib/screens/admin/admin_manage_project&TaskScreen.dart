@@ -1,4 +1,3 @@
-import 'package:exfactor/models/task_model.dart';
 import 'package:exfactor/screens/admin/admin_add_task_screen.dart';
 import 'package:exfactor/screens/admin/admin_add_project_screen.dart';
 import 'package:exfactor/screens/admin/admin_single_project_screen.dart';
@@ -188,7 +187,9 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
       if ((status == 'on progress' || status == 'progress') &&
           (endDate == null || endDate.isAfter(now))) {
         inProgress.add(t);
-      } else if (endDate != null && endDate.isBefore(now)) {
+      } else if (endDate != null &&
+          endDate.isBefore(now) &&
+          status != 'complete') {
         overdue.add(t);
       }
     }
@@ -201,7 +202,8 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return Scaffold(
+        body: SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,141 +274,44 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
           const SizedBox(
             height: 10,
           ),
-
-          ////////////////////////////////////////////////////////////////////////////
-          // In Progress Table list  Start
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: cardDarkGreen,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            child: const Text(
-              'In Progress Project',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16),
-            ),
+          // In Progress Project Table list  Start
+          UserUtils.buildExpandableGroup(
+            title: "On Progress Project",
+            color: cardDarkGreen,
+            expanded: showProjectProgress,
+            onToggle: () =>
+                setState(() => showProjectProgress = !showProjectProgress),
+            groupList: inProgressProjects,
+            onSeeMore: (project) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AdminSingleProjectScreen(
+                      projectId: project['project_id']?.toString() ?? ''),
+                ),
+              );
+            },
           ),
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            child: isLoadingProjectList
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-                    children: inProgressProjects.isEmpty
-                        ? [
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text('No in progress projects.'),
-                            )
-                          ]
-                        : inProgressProjects
-                            .map((p) => Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        p['title'] ?? '',
-                                        style: const TextStyle(fontSize: 15),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                AdminSingleProjectScreen(
-                                                    projectId: p['project_id']
-                                                            ?.toString() ??
-                                                        ''),
-                                          ),
-                                        );
-                                      },
-                                      child: const Text('See more ..'),
-                                    ),
-                                  ],
-                                ))
-                            .toList(),
-                  ),
-          ),
-          ////////////////////////////////////////////////////////////////////////////
-          // Overdue Progress Table list  Start
           const SizedBox(height: 10),
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: cardDarkRed,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            child: const Text(
-              'Overdue Project',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16),
-            ),
+          // Overdue Progress Table list  Start
+          UserUtils.buildExpandableGroup(
+            title: "Overdue Project",
+            color: cardRed,
+            expanded: showProjectOverdue,
+            onToggle: () =>
+                setState(() => showProjectOverdue = !showProjectOverdue),
+            groupList: overdueProjects,
+            onSeeMore: (project) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AdminSingleProjectScreen(
+                      projectId: project['project_id']?.toString() ?? ''),
+                ),
+              );
+            },
           ),
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            child: isLoadingProjectList
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-                    children: overdueProjects.isEmpty
-                        ? [
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text('No overdue projects.'),
-                            )
-                          ]
-                        : overdueProjects
-                            .map((p) => Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        p['title'] ?? '',
-                                        style: const TextStyle(fontSize: 15),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                AdminSingleProjectScreen(
-                                                    projectId: p['project_id']
-                                                            ?.toString() ??
-                                                        ''),
-                                          ),
-                                        );
-                                      },
-                                      child: const Text('See more ..'),
-                                    ),
-                                  ],
-                                ))
-                            .toList(),
-                  ),
-          ),
-
+          const SizedBox(height: 10),
           //mange Tasks
           const SizedBox(
             height: 20,
@@ -431,141 +336,48 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
           const SizedBox(
             height: 20,
           ),
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: cardDarkGreen,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            child: const Text(
-              'In Progress Tasks',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16),
-            ),
-          ),
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            child: isLoadingTaskList
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-                    children: inProgressTasks.isEmpty
-                        ? [
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text('No in progress tasks.'),
-                            )
-                          ]
-                        : inProgressTasks
-                            .map((t) => Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        t['title'] ?? '',
-                                        style: const TextStyle(fontSize: 15),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                AdminSingleTaskScreen(
-                                                    taskId: t['task_id']
-                                                            ?.toString() ??
-                                                        ''),
-                                          ),
-                                        );
-                                      },
-                                      child: const Text('See more ..'),
-                                    ),
-                                  ],
-                                ))
-                            .toList(),
-                  ),
+          // on Progress Task Table
+          UserUtils.buildExpandableGroup(
+            title: "In Progress Task",
+            color: cardDarkGreen,
+            expanded: showTaskProgress,
+            onToggle: () =>
+                setState(() => showTaskProgress = !showTaskProgress),
+            groupList: inProgressTasks,
+            onSeeMore: (task) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AdminSingleTaskScreen(
+                      taskId: task['task_id']?.toString() ?? ''),
+                ),
+              );
+            },
           ),
           // Overdue Task Table
           const SizedBox(height: 10),
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: cardDarkRed,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            child: const Text(
-              'Overdue Task',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16),
-            ),
+          UserUtils.buildExpandableGroup(
+            title: "In Progress Task",
+            color: cardRed,
+            expanded: showTaskOverdue,
+            onToggle: () => setState(() => showTaskOverdue = !showTaskOverdue),
+            groupList: overdueTasks,
+            onSeeMore: (task) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AdminSingleTaskScreen(
+                      taskId: task['task_id']?.toString() ?? ''),
+                ),
+              );
+            },
           ),
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            child: isLoadingTaskList
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-                    children: overdueTasks.isEmpty
-                        ? [
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text('No overdue tasks.'),
-                            )
-                          ]
-                        : overdueTasks
-                            .map((t) => Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        t['title'] ?? '',
-                                        style: const TextStyle(fontSize: 15),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                AdminSingleTaskScreen(
-                                                    taskId: t['task_id']
-                                                            ?.toString() ??
-                                                        ''),
-                                          ),
-                                        );
-                                      },
-                                      child: const Text('See more ..'),
-                                    ),
-                                  ],
-                                ))
-                            .toList(),
-                  ),
-          ),
+
           const SizedBox(
             height: 20,
           )
         ],
       ),
-    );
+    ));
   }
 }

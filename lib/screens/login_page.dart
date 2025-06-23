@@ -3,6 +3,8 @@ import 'package:exfactor/screens/supervisor/supervisor_main_screen.dart';
 import 'package:exfactor/screens/technical/technical_main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:exfactor/services/superbase_service.dart';
+import 'package:exfactor/models/user_model.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -27,20 +29,37 @@ class _LoginPageState extends State<LoginPage> {
     } else if (password.isEmpty) {
       _showToast("Please enter your password");
       return;
-    } else if (email == 'admin' || password == 'admin') {
+    }
+
+    // Static admin login
+    if (email == 'admin@exfactor.com' && password == 'admin123') {
       Navigator.push(context, MaterialPageRoute(builder: (_) {
-        return const AdminMainScreen();
+        return AdminMainScreen();
       }));
-    } else if (email == 'supervisor' || password == 'supervisor') {
-      Navigator.push(context, MaterialPageRoute(builder: (_) {
-        return const SupervisorMainScreen();
-      }));
-    } else if (email == 'technical' || password == 'technical') {
-      Navigator.push(context, MaterialPageRoute(builder: (_) {
-        return const TechnicalMainScreen();
-      }));
-    } else {
-      _showToast("No role found for this user.");
+      return;
+    }
+
+    try {
+      final userData = await SupabaseService.getUserByEmail(email);
+      if (userData == null) {
+        _showToast("User not found in database.");
+        return;
+      }
+      final userModel = UserModel.fromMap(userData);
+
+      if (userModel.role == 'Supervisor') {
+        Navigator.push(context, MaterialPageRoute(builder: (_) {
+          return SupervisorMainScreen(user: userModel);
+        }));
+      } else if (userModel.role == 'Technician') {
+        Navigator.push(context, MaterialPageRoute(builder: (_) {
+          return TechnicalMainScreen(user: userModel);
+        }));
+      } else {
+        _showToast("No role found for this user.");
+      }
+    } catch (e) {
+      _showToast("Login failed: \\${e.toString()}");
     }
   }
 

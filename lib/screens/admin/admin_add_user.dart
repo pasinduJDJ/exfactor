@@ -1,4 +1,3 @@
-import 'package:exfactor/services/superbase_service.dart';
 import 'package:exfactor/utils/colors.dart';
 import 'package:exfactor/utils/validators.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../models/user_model.dart';
-import '../../models/emergency_contact_model.dart';
+import 'package:exfactor/services/superbase_auth.dart';
 
 class AddUserScreen extends StatefulWidget {
   const AddUserScreen({super.key});
@@ -61,29 +60,9 @@ class _AddUserScreenState extends State<AddUserScreen> {
     }
     setState(() => _isLoading = true);
     try {
-      // 1. Sign up user in Supabase Auth
-      final signUpResponse = await SupabaseService.signUp(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-      final user = signUpResponse.user;
-      if (user == null) {
-        throw Exception('User registration failed.');
-      }
-      final userId = int.tryParse(user.id.replaceAll(RegExp(r'[^0-9]'), '')) ??
-          DateTime.now().millisecondsSinceEpoch;
-
-      // 2. Upload profile image (save storage path, not URL)
-      final fileName =
-          'profileimages/${userId}_${DateTime.now().millisecondsSinceEpoch}.png';
-      // Use the uploadProfileImage method, but only save the fileName (path) in DB
-      await SupabaseService.uploadProfileImage(
-          _pickedImage!, userId.toString());
-      final profileImagePath = fileName;
-
-      // 3. Insert user metadata
+      // 1. Prepare user model (without userId and profileImage for now)
       final userModel = UserModel(
-        userId: userId,
+        userId: null, // will be set after Auth registration
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         email: _emailController.text.trim(),
@@ -92,24 +71,29 @@ class _AddUserScreenState extends State<AddUserScreen> {
         joinDate: _selectedJoinDate!,
         designationDate: _selectedDesignationDate!,
         role: _selectedRole,
-        profileImage: profileImagePath,
+        profileImage: '', // will be set after image upload
         supervisor: _selectedSupervisor,
+        emergencyName: _emergencyContactNameController.text.trim(),
+        emergencyMobileNumber: _emergencyContactNumberController.text.trim(),
+        emergencyRelationship: _emergencyContactRelationController.text.trim(),
       );
-      await SupabaseService.insertUserMetaData(userModel.toMap());
 
-      // 4. Insert emergency contact
-      final emergencyContact = EmergencyContact(
-        name: _emergencyContactNameController.text.trim(),
-        mobileNumber: _emergencyContactNumberController.text.trim(),
-        relationship: _emergencyContactRelationController.text.trim(),
-        uId: userId,
+      // 2. Register user (handles Auth, image upload, and user table insert)
+      final result = await SuperbaseAuth.registerUser(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        userModel: userModel,
+        profileImageFile: _pickedImage!,
       );
-      await SupabaseService.insertEmergencyContact(emergencyContact);
 
-      _showToast('User created successfully!');
-      Navigator.of(context).pop();
+      if (result['success'] == true) {
+        _showToast('User created successfully!');
+        Navigator.of(context).pop();
+      } else {
+        _showToast('Error: \\${result['message']}');
+      }
     } catch (e) {
-      _showToast('Error: ${e.toString()}');
+      _showToast('Error: \\${e.toString()}');
     } finally {
       setState(() => _isLoading = false);
     }

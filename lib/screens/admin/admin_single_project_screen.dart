@@ -1,4 +1,7 @@
+import 'package:exfactor/screens/admin/admin_single_task_screen.dart';
 import 'package:exfactor/widgets/common/custom_app_bar_with_icon.dart';
+import 'package:exfactor/widgets/common/custom_button.dart';
+import 'package:exfactor/widgets/utils_widget.dart';
 import 'package:flutter/material.dart';
 import '../../utils/colors.dart';
 import 'package:exfactor/services/superbase_service.dart';
@@ -122,67 +125,28 @@ class _AdminSingleProjectScreenState extends State<AdminSingleProjectScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
+                      CustomButton(
+                        text: "In Archive Project",
                         onPressed: () {},
-                        child: const Text('In Archive Project'),
+                        backgroundColor: cardDarkRed,
                       ),
                       const SizedBox(height: 16),
-                      Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16)),
-                        elevation: 4,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Text('Task List',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold)),
+                      UserUtils.buildExpandableGroup(
+                        title: project!['title'],
+                        color: cardGreen,
+                        expanded: isLoadingTasks,
+                        onToggle: () =>
+                            setState(() => isLoadingTasks = !isLoadingTasks),
+                        groupList: projectTasks,
+                        onSeeMore: (task) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AdminSingleTaskScreen(
+                                  taskId: task['task_id']?.toString() ?? ''),
                             ),
-                            isLoadingTasks
-                                ? const Padding(
-                                    padding: EdgeInsets.all(16),
-                                    child: Center(
-                                        child: CircularProgressIndicator()),
-                                  )
-                                : projectTasks.isEmpty
-                                    ? const Padding(
-                                        padding: EdgeInsets.all(16),
-                                        child: Text(
-                                            'No tasks assigned to this project.'),
-                                      )
-                                    : Column(
-                                        children: projectTasks
-                                            .map((task) => ListTile(
-                                                  title:
-                                                      Text(task['title'] ?? ''),
-                                                  trailing: TextButton(
-                                                    onPressed: () {
-                                                      // TODO: Navigate to single task screen
-                                                    },
-                                                    child: const Text(
-                                                        'See more..'),
-                                                  ),
-                                                ))
-                                            .toList(),
-                                      ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
                     ],
                   ),

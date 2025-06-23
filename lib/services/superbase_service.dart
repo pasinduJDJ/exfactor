@@ -1,6 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:io';
-import 'package:exfactor/models/emergency_contact_model.dart';
 import 'package:exfactor/models/project_model.dart';
 import 'package:exfactor/models/notification_model.dart';
 import 'package:exfactor/models/task_model.dart';
@@ -65,11 +64,6 @@ class SupabaseService {
   // INSERT USER METADATA AFTER SIGN UP
   static Future<void> insertUserMetaData(Map<String, dynamic> userData) async {
     await _client.from('user').insert(userData);
-  }
-
-  // INSERT EMERGENCY CONTACT
-  static Future<void> insertEmergencyContact(EmergencyContact contact) async {
-    await _client.from('emergency_contact').insert(contact.toMap());
   }
 
   // INSERT PROJECT
@@ -169,5 +163,23 @@ class SupabaseService {
       int projectId) async {
     final response = await _client.from('task').select().eq('p_id', projectId);
     return List<Map<String, dynamic>>.from(response);
+  }
+
+  // DELETE USER
+  static Future<void> deleteUser(int userId) async {
+    await _client.from('user').delete().eq('id', userId);
+  }
+
+  // DELETE EMERGENCY CONTACTS BY USER ID
+  static Future<void> deleteEmergencyContactsByUserId(int userId) async {
+    await _client.from('emergency_contact').delete().eq('u_id', userId);
+  }
+
+  // GET USER BY EMAIL
+  static Future<Map<String, dynamic>?> getUserByEmail(String email) async {
+    final response =
+        await _client.from('user').select().eq('email', email).maybeSingle();
+    if (response == null) return null;
+    return Map<String, dynamic>.from(response);
   }
 }

@@ -125,7 +125,46 @@ class _AdminSingleProfileScreenState extends State<AdminSingleProfileScreen> {
                               ),
                               CustomButton(
                                 text: "Remove Member",
-                                onPressed: () {},
+                                onPressed: () async {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  try {
+                                    final userIdInt =
+                                        int.tryParse(widget.userId);
+                                    if (userIdInt != null) {
+                                      await SupabaseService
+                                          .deleteEmergencyContactsByUserId(
+                                              userIdInt);
+                                      await SupabaseService.deleteUser(
+                                          userIdInt);
+                                      if (mounted) {
+                                        Navigator.of(context).pop(true);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  'User removed successfully.')),
+                                        );
+                                      }
+                                    }
+                                  } catch (e) {
+                                    if (mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                'Failed to remove user: \\${e.toString()}')),
+                                      );
+                                    }
+                                  } finally {
+                                    if (mounted) {
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                    }
+                                  }
+                                },
                                 backgroundColor: cardDarkRed,
                                 width: double.infinity / 2,
                               ),

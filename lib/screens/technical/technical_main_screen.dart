@@ -5,9 +5,11 @@ import 'technical_home.dart';
 import 'technical_task_screen.dart';
 import 'technical_notification_screen.dart';
 import 'technical_profile_screen.dart';
+import 'package:exfactor/models/user_model.dart';
 
 class TechnicalMainScreen extends StatefulWidget {
-  const TechnicalMainScreen({super.key});
+  final UserModel user;
+  const TechnicalMainScreen({Key? key, required this.user}) : super(key: key);
 
   @override
   State<TechnicalMainScreen> createState() => _TechnicalMainScreenState();
@@ -16,12 +18,18 @@ class TechnicalMainScreen extends StatefulWidget {
 class _TechnicalMainScreenState extends State<TechnicalMainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const TechnicalHome(),
-    const TaskTrackingBody(),
-    const TechnicalReportScreen(),
-    const TechnicalProfileScreen(),
-  ];
+  late final List<Widget> _screens;
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      TechnicalHome(user: widget.user),
+      const TaskTrackingBody(),
+      const TechnicalReportScreen(),
+      const TechnicalProfileScreen(),
+    ];
+  }
 
   final List<BottomNavigationBarItem> _navigationItems = const [
     BottomNavigationBarItem(
@@ -45,11 +53,14 @@ class _TechnicalMainScreenState extends State<TechnicalMainScreen> {
   PreferredSizeWidget? _getCustomAppBar() {
     switch (_currentIndex) {
       case 1:
-        return const CustomAppBarWithIcon(title: 'Epic Task Tracking', icon: Icons.list_alt);
+        return const CustomAppBarWithIcon(
+            title: 'Epic Task Tracking', icon: Icons.list_alt);
       case 2:
-        return const CustomAppBarWithIcon(title: 'Notifications', icon: Icons.notifications_active);
+        return const CustomAppBarWithIcon(
+            title: 'Notifications', icon: Icons.notifications_active);
       case 3:
-        return const CustomAppBarWithIcon(title: 'My Profile', icon: Icons.account_circle);
+        return const CustomAppBarWithIcon(
+            title: 'My Profile', icon: Icons.account_circle);
       default:
         return null; // use default avatar header for Home
     }

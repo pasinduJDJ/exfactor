@@ -1,3 +1,4 @@
+import 'package:exfactor/widgets/common/custom_button.dart';
 import 'package:flutter/material.dart';
 import '../../utils/colors.dart';
 import 'package:exfactor/services/superbase_service.dart';
@@ -79,9 +80,9 @@ class _AdminSingleTaskScreenState extends State<AdminSingleTaskScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Container(
-                              decoration: BoxDecoration(
-                                color: cardOrenge,
-                                borderRadius: const BorderRadius.only(
+                              decoration: const BoxDecoration(
+                                color: cardGreen,
+                                borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(16),
                                   topRight: Radius.circular(16),
                                 ),
@@ -100,7 +101,7 @@ class _AdminSingleTaskScreenState extends State<AdminSingleTaskScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   _infoRow('Project Title',
-                                      task!['p_id']?.toString() ?? ''),
+                                      task!['title']?.toString() ?? ''),
                                   _infoRow('Commencement Date',
                                       task!['start_date'] ?? ''),
                                   _infoRow('Expected Delivery Date',
@@ -112,21 +113,13 @@ class _AdminSingleTaskScreenState extends State<AdminSingleTaskScreen> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: kPrimaryColor,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8)),
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                                onPressed: () {},
-                                child: const Text('Remove'),
-                              ),
-                            ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
+                                child: CustomButton(
+                                  text: "Remove",
+                                  onPressed: () {},
+                                  backgroundColor: cardDarkRed,
+                                )),
                           ],
                         ),
                       ),
