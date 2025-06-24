@@ -244,7 +244,6 @@ class _AddUserScreenState extends State<AddUserScreen> {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
-      print("Picked image path: ${image.path}");
       setState(() {
         _pickedImage = File(image.path);
       });
@@ -348,7 +347,6 @@ class _AddUserScreenState extends State<AddUserScreen> {
       String label, DateTime? date, Function(DateTime) onDateSelected) {
     return GestureDetector(
       onTap: () async {
-        //DateTime now = DateTime.now();
         final DateTime? picked = await showDatePicker(
           context: context,
           initialDate: DateTime.now(),
@@ -387,7 +385,6 @@ class _AddUserScreenState extends State<AddUserScreen> {
       String label, DateTime? date, Function(DateTime) onDateSelected) {
     return GestureDetector(
       onTap: () async {
-        //DateTime now = DateTime.now();
         final DateTime? picked = await showDatePicker(
           context: context,
           initialDate: DateTime.now(),
@@ -426,7 +423,6 @@ class _AddUserScreenState extends State<AddUserScreen> {
       String label, DateTime? date, Function(DateTime) onDateSelected) {
     return GestureDetector(
       onTap: () async {
-        //DateTime now = DateTime.now();
         final DateTime? picked = await showDatePicker(
           context: context,
           initialDate: DateTime.now(),

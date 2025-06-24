@@ -1,5 +1,6 @@
 import 'package:exfactor/services/superbase_service.dart';
 import 'package:exfactor/utils/colors.dart';
+import 'package:exfactor/widgets/common/custom_button.dart';
 import 'package:flutter/material.dart';
 
 class TechnicalSingleTask extends StatefulWidget {
@@ -87,9 +88,9 @@ class _TechnicalSingleTaskState extends State<TechnicalSingleTask> {
                               ),
                               padding: const EdgeInsets.symmetric(
                                   vertical: 12, horizontal: 16),
-                              child: Text(
-                                  'Task Title : ${task!['title'] ?? ''}',
+                              child: Text('${task!['title'] ?? ''}',
                                   style: const TextStyle(
+                                      fontSize: 20,
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold)),
                             ),
@@ -100,13 +101,25 @@ class _TechnicalSingleTaskState extends State<TechnicalSingleTask> {
                                 children: [
                                   _infoRow('Project Title',
                                       task!['title']?.toString() ?? ''),
+                                  const Divider(thickness: 1),
                                   _infoRow('Commencement Date',
                                       task!['start_date'] ?? ''),
+                                  const Divider(thickness: 1),
                                   _infoRow('Expected Delivery Date',
                                       task!['end_date'] ?? ''),
+                                  const Divider(thickness: 1),
                                   _infoRow('Supervisor name',
                                       task!['supervisor'] ?? ''),
+                                  const Divider(thickness: 1),
                                   _infoRow('Status', task!['status'] ?? ''),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  CustomButton(
+                                      text: "Request Status Update",
+                                      width: double.infinity,
+                                      backgroundColor: kPrimaryColor,
+                                      onPressed: () {}),
                                 ],
                               ),
                             ),

@@ -58,14 +58,10 @@ class _TaskTrackingBodyState extends State<TaskTrackingBody> {
         try {
           endDate = DateTime.parse(endDateStr);
         } catch (_) {
-          print('Invalid date for task: $task');
           continue; // skip if date is invalid
         }
 
-        print('Task: ${task['title']} | endDate: $endDate');
-
         if (endDate.month != currentMonth || endDate.year != currentYear) {
-          print('Skipping (not in current month): ${task['title']}');
           continue;
         }
 

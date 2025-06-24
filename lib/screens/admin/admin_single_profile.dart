@@ -35,7 +35,6 @@ class _AdminSingleProfileScreenState extends State<AdminSingleProfileScreen> {
         return;
       }
       final userData = await SupabaseService.getUserByEmail(userEmail);
-      print('Fetched user data: ' + userData.toString());
       setState(() {
         user = userData;
         isLoading = false;
@@ -101,23 +100,33 @@ class _AdminSingleProfileScreenState extends State<AdminSingleProfileScreen> {
                               const SizedBox(height: 16),
                               _infoRow('Full Name',
                                   "${user!['first_name'] ?? ''} ${user!['last_name'] ?? ''}"),
+                              const Divider(thickness: 1),
                               _infoRow('Email Address', user!['email'] ?? ''),
+                              const Divider(thickness: 1),
                               _infoRow('Mobile Number', user!['mobile'] ?? ''),
+                              const Divider(thickness: 1),
                               _infoRow(
                                   'Date of Birth', user!['birthday'] ?? ''),
-                              _infoRow('Joined Date', user!['joindate'] ?? ''),
-                              _infoRow(
-                                  'Designation', user!['designation'] ?? ''),
+                              const Divider(thickness: 1),
+                              _infoRow('Joined Date', user!['join_date'] ?? ''),
+                              const Divider(thickness: 1),
+                              _infoRow('Designation',
+                                  user!['designation_date'] ?? ''),
+                              const Divider(thickness: 1),
                               _infoRow('Supervisor', user!['supervisor'] ?? ''),
+                              const Divider(thickness: 1),
                               _infoRow('Permission Type', user!['role'] ?? ''),
+                              const Divider(thickness: 1),
                               const SizedBox(height: 10),
                               // Emergency contact fields if available
                               if (user!['emergency_name'] != null)
                                 _infoRow('Emergency Name',
                                     user!['emergency_name'] ?? ''),
-                              if (user!['emergency_relation'] != null)
+                              const Divider(thickness: 1),
+                              if (user!['emergency_relationship'] != null)
                                 _infoRow('Relationship',
-                                    user!['emergency_relation'] ?? ''),
+                                    user!['emergency_relationship'] ?? ''),
+                              const Divider(thickness: 1),
                               if (user!['emergency_number'] != null)
                                 _infoRow('Contact number',
                                     user!['emergency_number'] ?? ''),

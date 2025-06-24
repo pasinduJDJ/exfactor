@@ -357,7 +357,7 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
           // Overdue Task Table
           const SizedBox(height: 10),
           UserUtils.buildExpandableGroup(
-            title: "In Progress Task",
+            title: "Overdue Task",
             color: cardRed,
             expanded: showTaskOverdue,
             onToggle: () => setState(() => showTaskOverdue = !showTaskOverdue),
