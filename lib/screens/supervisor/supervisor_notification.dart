@@ -67,24 +67,29 @@ class _SupervisorNotificationState extends State<SupervisorNotification> {
           const SizedBox(height: 10),
           isLoading
               ? const CircularProgressIndicator()
-              : TechnicalNotificationCard.buildNotificationCards(
-                  todayNotifications
-                      .map((n) => {
-                            'notification_id': n['notification_id'],
-                            'title': n['title'] ?? '',
-                            'subtitle': n['message'] ?? '',
-                            'type': n['type'] ?? '',
-                            'submission_date': n['schedule_date'] ?? '',
-                          })
-                      .toList(),
-                  onDelete: (int notificationId) async {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    await SupabaseService.deleteNotification(notificationId);
-                    await fetchNotifications();
-                  },
-                ),
+              : todayNotifications.isEmpty
+                  ? const Center(
+                      child: Text('Notification Bucket Clear',
+                          style: TextStyle(fontSize: 16, color: Colors.grey)))
+                  : TechnicalNotificationCard.buildNotificationCards(
+                      todayNotifications
+                          .map((n) => {
+                                'notification_id': n['notification_id'],
+                                'title': n['title'] ?? '',
+                                'subtitle': n['message'] ?? '',
+                                'type': n['type'] ?? '',
+                                'submission_date': n['schedule_date'] ?? '',
+                              })
+                          .toList(),
+                      onDelete: (int notificationId) async {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        await SupabaseService.deleteNotification(
+                            notificationId);
+                        await fetchNotifications();
+                      },
+                    ),
         ],
       ),
     );

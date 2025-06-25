@@ -4,55 +4,132 @@ import 'package:exfactor/widgets/utils_widget.dart';
 import 'package:flutter/material.dart';
 import '../../utils/constants.dart';
 import '../../widgets/common/custom_button.dart';
+import 'package:exfactor/services/superbase_service.dart';
+import 'package:exfactor/models/user_model.dart';
 
 class SupervisorTaskScreen extends StatefulWidget {
-  const SupervisorTaskScreen({Key? key}) : super(key: key);
+  final UserModel? user;
+  const SupervisorTaskScreen({Key? key, this.user}) : super(key: key);
 
   @override
   State<SupervisorTaskScreen> createState() => _SupervisorTaskScreenState();
 }
 
 class _SupervisorTaskScreenState extends State<SupervisorTaskScreen> {
+  List<Map<String, dynamic>> _pendingRequests = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRequests();
+  }
+
+  Future<void> _fetchRequests() async {
+    if (widget.user == null) return;
+    setState(() => _loading = true);
+    final requests =
+        await SupabaseService.getPendingStatusRequests(widget.user!.memberId);
+    setState(() {
+      _pendingRequests = requests;
+      _loading = false;
+    });
+  }
+
+  Future<String> _getTaskTitle(int taskId) async {
+    final tasks = await SupabaseService.getAllTasks();
+    final task =
+        tasks.firstWhere((t) => t['task_id'] == taskId, orElse: () => {});
+    return task['title']?.toString() ?? 'Unknown';
+  }
+
+  Future<String> _getTechnicianName(int technicianId) async {
+    final users = await SupabaseService.getAllUsers();
+    final user = users.firstWhere((u) => u['member_id'] == technicianId,
+        orElse: () => {});
+    return user.isNotEmpty
+        ? '${user['first_name']} ${user['last_name']}'
+        : 'Unknown';
+  }
+
+  void _approveRequest(int requestId) async {
+    await SupabaseService.approveStatusRequest(requestId);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Request approved!')));
+    await _fetchRequests();
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> statusItems = [
-      {'label': 'OVER DUE', 'count': 0, 'color': cardRed},
-      {'label': 'PENDING', 'count': 5, 'color': cardYellow},
-      {'label': 'ON PROGRESS', 'count': 15, 'color': cardGreen},
-      {'label': 'Complete', 'count': 2, 'color': cardLightBlue},
-    ];
-
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 20),
-          UserUtils.buildStatusSummaryCard(statusItems),
-          const SizedBox(
-            height: 20,
-          ),
+          const SizedBox(height: 20),
           CustomButton(
-            text: "Add New Task",
+            text: "Assign New Tasks",
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => const AdminAddTaskScreen()));
+                context,
+                MaterialPageRoute(builder: (context) => AdminAddTaskScreen()),
+              );
             },
             width: double.infinity,
-            icon: Icon(Icons.task),
+            backgroundColor: kPrimaryColor,
+            icon: const Icon(Icons.task),
           ),
-          const SizedBox(
-            height: 40,
-          ),
+          const SizedBox(height: 30),
           const Text(
-            "Currently Assign Projects | Tasks",
+            "Status Update Request",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(
-            height: 20,
-          ),
-          supervisorTaskCard()
+          const SizedBox(height: 20),
+          _loading
+              ? const CircularProgressIndicator()
+              : _pendingRequests.isEmpty
+                  ? const Text('No pending status requests.')
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _pendingRequests.length,
+                      itemBuilder: (context, index) {
+                        final req = _pendingRequests[index];
+                        return FutureBuilder<List<String>>(
+                          future: Future.wait([
+                            _getTaskTitle(req['task_id']),
+                            _getTechnicianName(req['technician_id']),
+                          ]),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return const ListTile(title: Text('Loading...'));
+                            }
+                            final taskTitle = snapshot.data![0];
+                            final techName = snapshot.data![1];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(vertical: 8),
+                              child: ListTile(
+                                title: Text('Task: $taskTitle'),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Technician: $techName'),
+                                    Text(
+                                        'Requested Status: ${req['requested_status']}'),
+                                  ],
+                                ),
+                                trailing: ElevatedButton(
+                                  onPressed: () =>
+                                      _approveRequest(req['request_id']),
+                                  child: const Text('Approve'),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
         ],
       ),
     );

@@ -13,6 +13,8 @@ class TechnicalSingleTask extends StatefulWidget {
 
 class _TechnicalSingleTaskState extends State<TechnicalSingleTask> {
   Map<String, dynamic>? task;
+  Map<String, dynamic>? project;
+  Map<String, dynamic>? supervisor;
   bool isLoading = true;
 
   @override
@@ -33,8 +35,33 @@ class _TechnicalSingleTaskState extends State<TechnicalSingleTask> {
       final data = await SupabaseService.getAllTasks();
       final t = data.firstWhere((t) => t['task_id'].toString() == widget.taskId,
           orElse: () => {});
+      if (t.isEmpty) {
+        setState(() {
+          task = null;
+          isLoading = false;
+        });
+        return;
+      }
+      // Fetch project and supervisor
+      final projectId =
+          t['p_id'] is int ? t['p_id'] : int.tryParse(t['p_id'].toString());
+      Map<String, dynamic>? proj;
+      Map<String, dynamic>? sup;
+      if (projectId != null) {
+        proj = await SupabaseService.getProjectById(projectId);
+        if (proj != null && proj['supervisor_id'] != null) {
+          final supervisorId = proj['supervisor_id'] is int
+              ? proj['supervisor_id']
+              : int.tryParse(proj['supervisor_id'].toString());
+          if (supervisorId != null) {
+            sup = await SupabaseService.getUserByMemberId(supervisorId);
+          }
+        }
+      }
       setState(() {
-        task = t.isNotEmpty ? t : null;
+        task = t;
+        project = proj;
+        supervisor = sup;
         isLoading = false;
       });
     } catch (e) {
@@ -88,18 +115,22 @@ class _TechnicalSingleTaskState extends State<TechnicalSingleTask> {
                               ),
                               padding: const EdgeInsets.symmetric(
                                   vertical: 12, horizontal: 16),
-                              child: Text('${task!['title'] ?? ''}',
-                                  style: const TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold)),
+                              child: Text(
+                                project != null && project!['title'] != null
+                                    ? project!['title']
+                                    : 'Project',
+                                style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(16),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _infoRow('Project Title',
+                                  _infoRow('Task Title',
                                       task!['title']?.toString() ?? ''),
                                   const Divider(thickness: 1),
                                   _infoRow('Commencement Date',
@@ -108,18 +139,23 @@ class _TechnicalSingleTaskState extends State<TechnicalSingleTask> {
                                   _infoRow('Expected Delivery Date',
                                       task!['end_date'] ?? ''),
                                   const Divider(thickness: 1),
-                                  _infoRow('Supervisor name',
-                                      task!['supervisor'] ?? ''),
+                                  _infoRow(
+                                      'Supervisor name',
+                                      supervisor != null
+                                          ? '${supervisor!['first_name'] ?? ''} ${supervisor!['last_name'] ?? ''}'
+                                          : 'N/A'),
                                   const Divider(thickness: 1),
                                   _infoRow('Status', task!['status'] ?? ''),
                                   const SizedBox(
                                     height: 20,
                                   ),
                                   CustomButton(
-                                      text: "Request Status Update",
-                                      width: double.infinity,
-                                      backgroundColor: kPrimaryColor,
-                                      onPressed: () {}),
+                                    text: "Request Status Update",
+                                    width: double.infinity,
+                                    backgroundColor: kPrimaryColor,
+                                    onPressed: () =>
+                                        _showStatusRequestDialog(context),
+                                  ),
                                 ],
                               ),
                             ),
@@ -130,6 +166,65 @@ class _TechnicalSingleTaskState extends State<TechnicalSingleTask> {
                   ),
                 ),
     );
+  }
+
+  void _showStatusRequestDialog(BuildContext context) async {
+    String? selectedStatus;
+    final statuses = ['On Progress', 'Hold', 'Complete'];
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Request Status Change'),
+          content: DropdownButtonFormField<String>(
+            value: selectedStatus,
+            items: statuses
+                .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                .toList(),
+            onChanged: (val) {
+              selectedStatus = val;
+            },
+            decoration: const InputDecoration(
+              labelText: 'Select new status',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (selectedStatus == null) return;
+                Navigator.of(ctx).pop();
+                await _submitStatusRequest(selectedStatus!);
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _submitStatusRequest(String status) async {
+    try {
+      // You need to get the technician's id from context/session
+      // For now, assume technicianId is available as a member of the task
+      final technicianId =
+          int.tryParse((task!['members'] as String).split(',').first);
+      if (technicianId == null) throw Exception('Technician ID not found');
+      final taskId = int.tryParse(task!['task_id'].toString());
+      if (taskId == null) throw Exception('Task ID not found');
+      await SupabaseService.insertStatusRequest(taskId, technicianId, status);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Status change request submitted!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
   }
 
   Widget _infoRow(String label, String value) {

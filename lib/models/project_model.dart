@@ -9,8 +9,8 @@ class ProjectModel {
   final String clientCountry;
   final String projectStartDate;
   final String projectEndDate;
-  final String supervisor;
   final String projectStatus;
+  final int supervisorId;
 
   ProjectModel({
     this.projectId,
@@ -23,8 +23,8 @@ class ProjectModel {
     required this.clientCountry,
     required this.projectStartDate,
     required this.projectEndDate,
-    required this.supervisor,
     required this.projectStatus,
+    required this.supervisorId,
   });
 
   Map<String, dynamic> toMap() {
@@ -38,8 +38,8 @@ class ProjectModel {
       'client_country': clientCountry,
       'start_date': projectStartDate,
       'end_date': projectEndDate,
-      'supervisor': supervisor,
       'status': projectStatus,
+      'supervisor_id': supervisorId,
     };
 
     // Only include project_id if it's not null
@@ -64,8 +64,10 @@ class ProjectModel {
       clientCountry: map['client_country'],
       projectStartDate: map['start_date'],
       projectEndDate: map['end_date'],
-      supervisor: map['supervisor'],
       projectStatus: map['status'],
+      supervisorId: map['supervisor_id'] is int
+          ? map['supervisor_id']
+          : int.tryParse(map['supervisor_id'].toString()) ?? 0,
     );
   }
 }

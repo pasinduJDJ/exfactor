@@ -6,6 +6,7 @@ class TaskModel {
   final String members; // Will store comma-separated member IDs
   final String status;
   final int pId; // Project ID
+  final int? supervisorId; // Supervisor ID
 
   TaskModel({
     this.taskId,
@@ -15,6 +16,7 @@ class TaskModel {
     required this.members,
     required this.status,
     required this.pId,
+    this.supervisorId,
   });
 
   Map<String, dynamic> toMap() {
@@ -26,12 +28,12 @@ class TaskModel {
       'status': status,
       'p_id': pId,
     };
-
-    // Only include task_id if it's not null
+    if (supervisorId != null) {
+      map['supervisor_id'] = supervisorId as Object;
+    }
     if (taskId != null) {
       map['task_id'] = taskId.toString();
     }
-
     return map;
   }
 
@@ -46,6 +48,11 @@ class TaskModel {
       members: map['members'],
       status: map['status'],
       pId: map['p_id'],
+      supervisorId: map['supervisor_id'] != null
+          ? (map['supervisor_id'] is int
+              ? map['supervisor_id']
+              : int.tryParse(map['supervisor_id'].toString()))
+          : null,
     );
   }
 }

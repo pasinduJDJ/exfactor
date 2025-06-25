@@ -44,7 +44,7 @@ class _SupervisorMainScreenState extends State<SupervisorMainScreen> {
     super.initState();
     _screens = [
       SupervisorHome(user: widget.user),
-      const SupervisorTaskScreen(),
+      SupervisorTaskScreen(user: widget.user),
       const SupervisorNotification(),
       SupervisorProfileScreen(user: widget.user),
     ];

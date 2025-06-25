@@ -21,7 +21,7 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
   final _emailController = TextEditingController();
   final _mobileController = TextEditingController();
   String? _selectedCountry;
-  String? _selectedSupervisor;
+  int? _selectedSupervisor;
   DateTime? _commencementDate;
   DateTime? _deliveryDate;
   bool _isLoading = false;
@@ -270,8 +270,8 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
         clientCountry: _selectedCountry ?? '',
         projectStartDate: _commencementDate!.toIso8601String(),
         projectEndDate: _deliveryDate!.toIso8601String(),
-        supervisor: _selectedSupervisor!,
-        projectStatus: 'pending', // Default status for new projects
+        supervisorId: _selectedSupervisor!,
+        projectStatus: 'pending',
       );
 
       await SupabaseService.insertProject(project);
@@ -376,7 +376,10 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
                     child: _buildDropdown(
                         'Select Supervisor',
                         _supervisors
-                            .map((e) => '${e['first_name']} ${e['last_name']}')
+                            .map((e) => {
+                                  'id': e['member_id'],
+                                  'name': '${e['first_name']} ${e['last_name']}'
+                                })
                             .toList(),
                         _selectedSupervisor,
                         (val) => setState(() => _selectedSupervisor = val)),
@@ -451,14 +454,15 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
     );
   }
 
-  Widget _buildDropdown(String hint, List<String> items, String? value,
-      ValueChanged<String?> onChanged) {
+  Widget _buildDropdown(String hint, List<Map<String, dynamic>> items,
+      int? value, ValueChanged<int?> onChanged) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(hint),
-      DropdownButtonFormField<String>(
+      DropdownButtonFormField<int>(
         value: value,
         items: items
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+            .map((e) => DropdownMenuItem<int>(
+                value: e['id'] as int, child: Text(e['name'])))
             .toList(),
         onChanged: onChanged,
         decoration: InputDecoration(
@@ -470,7 +474,7 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
           contentPadding:
               const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
         ),
-        validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+        validator: (val) => val == null ? 'Required' : null,
       )
     ]);
   }

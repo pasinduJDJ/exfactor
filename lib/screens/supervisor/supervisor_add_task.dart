@@ -1,19 +1,18 @@
-import 'package:exfactor/utils/constants.dart';
+import 'package:exfactor/models/task_model.dart';
+import 'package:exfactor/services/superbase_service.dart';
+import 'package:exfactor/utils/colors.dart';
+import 'package:exfactor/widgets/common/custom_button.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/common/custom_button.dart';
-import '../../utils/colors.dart';
-import '../../services/superbase_service.dart';
-import '../../models/task_model.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class AdminAddTaskScreen extends StatefulWidget {
-  const AdminAddTaskScreen({Key? key}) : super(key: key);
+class SupervisorAddTask extends StatefulWidget {
+  const SupervisorAddTask({super.key});
 
   @override
-  State<AdminAddTaskScreen> createState() => _AdminAddTaskScreenState();
+  State<SupervisorAddTask> createState() => _SupervisorAddTaskState();
 }
 
-class _AdminAddTaskScreenState extends State<AdminAddTaskScreen> {
+class _SupervisorAddTaskState extends State<SupervisorAddTask> {
   final _formKey = GlobalKey<FormState>();
   final _taskTitleController = TextEditingController();
   String? _selectedProject;
@@ -53,6 +52,39 @@ class _AdminAddTaskScreenState extends State<AdminAddTaskScreen> {
       });
     } catch (e) {
       _showToast('Error loading technical members: ${e.toString()}');
+    }
+  }
+
+  void _showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: message.toLowerCase().contains('error') ||
+              message.toLowerCase().contains('failed') ||
+              message.toLowerCase().contains('please')
+          ? Colors.red
+          : Colors.green,
+      textColor: Colors.white,
+      fontSize: 14.0,
+    );
+  }
+
+  Future<void> _pickDate(BuildContext context, bool isCommencement) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() {
+        if (isCommencement) {
+          _commencementDate = picked;
+        } else {
+          _deliveryDate = picked;
+        }
+      });
     }
   }
 
@@ -102,39 +134,6 @@ class _AdminAddTaskScreenState extends State<AdminAddTaskScreen> {
       _showToast('Error creating task: ${e.toString()}');
     } finally {
       setState(() => _isLoading = false);
-    }
-  }
-
-  void _showToast(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: message.toLowerCase().contains('error') ||
-              message.toLowerCase().contains('failed') ||
-              message.toLowerCase().contains('please')
-          ? Colors.red
-          : Colors.green,
-      textColor: Colors.white,
-      fontSize: 14.0,
-    );
-  }
-
-  Future<void> _pickDate(BuildContext context, bool isCommencement) async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      setState(() {
-        if (isCommencement) {
-          _commencementDate = picked;
-        } else {
-          _deliveryDate = picked;
-        }
-      });
     }
   }
 
