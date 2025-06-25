@@ -13,6 +13,7 @@ class TechnicalReportScreen extends StatefulWidget {
 
 class _TechnicalReportScreenState extends State<TechnicalReportScreen> {
   List<Map<String, dynamic>> notifications = [];
+  List<Map<String, dynamic>> todayNotifications = [];
   bool isLoading = true;
   @override
   void initState() {
@@ -23,8 +24,29 @@ class _TechnicalReportScreenState extends State<TechnicalReportScreen> {
   Future<void> fetchNotifications() async {
     try {
       final fetchedNotifications = await SupabaseService.getAllNotifications();
+      notifications = fetchedNotifications;
+      todayNotifications.clear();
+
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+
+      for (var n in notifications) {
+        final dateStr = n['schedule_date'] ?? '';
+        if (dateStr.isEmpty) continue;
+        DateTime? notifDate;
+        try {
+          notifDate = DateTime.parse(dateStr);
+        } catch (_) {
+          continue;
+        }
+        final notifDay =
+            DateTime(notifDate.year, notifDate.month, notifDate.day);
+        if (notifDay == today) {
+          todayNotifications.add(n);
+        }
+      }
+
       setState(() {
-        notifications = fetchedNotifications;
         isLoading = false;
       });
     } catch (e) {
@@ -46,7 +68,7 @@ class _TechnicalReportScreenState extends State<TechnicalReportScreen> {
           isLoading
               ? const CircularProgressIndicator()
               : TechnicalNotificationCard.buildNotificationCards(
-                  notifications
+                  todayNotifications
                       .map((n) => {
                             'notification_id': n['notification_id'],
                             'title': n['title'] ?? '',

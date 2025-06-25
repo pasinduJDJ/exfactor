@@ -29,13 +29,13 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
 
   // Separate expand/collapse state for projects
   bool showProjectPending = false;
-  bool showProjectProgress = true;
+  bool showProjectProgress = false;
   bool showProjectOverdue = false;
   bool showProjectComplete = false;
 
   // Separate expand/collapse state for tasks
   bool showTaskPending = false;
-  bool showTaskProgress = true;
+  bool showTaskProgress = false;
   bool showTaskOverdue = false;
   bool showTaskComplete = false;
 
@@ -44,8 +44,10 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
 
   List<Map<String, dynamic>> inProgressProjects = [];
   List<Map<String, dynamic>> overdueProjects = [];
+  List<Map<String, dynamic>> pendingProjects = [];
   List<Map<String, dynamic>> inProgressTasks = [];
   List<Map<String, dynamic>> overdueTasks = [];
+  List<Map<String, dynamic>> pendingTasks = [];
   bool isLoadingProjectList = true;
   bool isLoadingTaskList = true;
 
@@ -141,6 +143,7 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
     final now = DateTime.now();
     List<Map<String, dynamic>> inProgress = [];
     List<Map<String, dynamic>> overdue = [];
+    List<Map<String, dynamic>> pending = [];
     for (final p in projects) {
       final status = (p['status'] ?? '').toString().toLowerCase();
       final endDateStr = p['end_date'] ?? p['project_end_date'] ?? '';
@@ -155,11 +158,15 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
         inProgress.add(p);
       } else if (endDate != null && endDate.isBefore(now)) {
         overdue.add(p);
+      } else if ((status == 'pending') &&
+          (endDate == null || endDate.isAfter(now))) {
+        pending.add(p);
       }
     }
     setState(() {
       inProgressProjects = inProgress;
       overdueProjects = overdue;
+      pendingProjects = pending;
       isLoadingProjectList = false;
     });
   }
@@ -174,7 +181,7 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
 
     List<Map<String, dynamic>> inProgress = [];
     List<Map<String, dynamic>> overdue = [];
-
+    List<Map<String, dynamic>> pending = [];
     for (final t in tasks) {
       final status = (t['status'] ?? '').toString().toLowerCase();
       final endDateStr = t['end_date'] ?? t['project_end_date'] ?? '';
@@ -191,11 +198,15 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
           endDate.isBefore(now) &&
           status != 'complete') {
         overdue.add(t);
+      } else if ((status == 'pending') &&
+          (endDate == null || endDate.isAfter(now))) {
+        pending.add(t);
       }
     }
     setState(() {
       inProgressTasks = inProgress;
       overdueTasks = overdue;
+      pendingTasks = pending;
       isLoadingTaskList = false;
     });
   }
@@ -293,7 +304,7 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
             },
           ),
           const SizedBox(height: 10),
-          // Overdue Progress Table list  Start
+          // Overdue Project Table list  Start
           UserUtils.buildExpandableGroup(
             title: "Overdue Project",
             color: cardRed,
@@ -301,6 +312,25 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
             onToggle: () =>
                 setState(() => showProjectOverdue = !showProjectOverdue),
             groupList: overdueProjects,
+            onSeeMore: (project) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AdminSingleProjectScreen(
+                      projectId: project['project_id']?.toString() ?? ''),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 10),
+          // Pending Project Table list  Start
+          UserUtils.buildExpandableGroup(
+            title: "Pending Project",
+            color: cardDarkYellow,
+            expanded: showProjectPending,
+            onToggle: () =>
+                setState(() => showProjectPending = !showProjectPending),
+            groupList: pendingProjects,
             onSeeMore: (project) {
               Navigator.push(
                 context,
@@ -362,6 +392,24 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
             expanded: showTaskOverdue,
             onToggle: () => setState(() => showTaskOverdue = !showTaskOverdue),
             groupList: overdueTasks,
+            onSeeMore: (task) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AdminSingleTaskScreen(
+                      taskId: task['task_id']?.toString() ?? ''),
+                ),
+              );
+            },
+          ),
+          // Pending Task Table
+          const SizedBox(height: 10),
+          UserUtils.buildExpandableGroup(
+            title: "Pending Task",
+            color: cardYellow,
+            expanded: showTaskPending,
+            onToggle: () => setState(() => showTaskPending = !showTaskPending),
+            groupList: pendingTasks,
             onSeeMore: (task) {
               Navigator.push(
                 context,

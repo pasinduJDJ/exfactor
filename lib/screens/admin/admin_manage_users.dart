@@ -39,7 +39,8 @@ class _MangeUsersState extends State<MangeUsers> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return Scaffold(
+        body: SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 15),
       child: Column(
         children: [
@@ -87,6 +88,6 @@ class _MangeUsersState extends State<MangeUsers> {
                 ),
         ],
       ),
-    );
+    ));
   }
 }

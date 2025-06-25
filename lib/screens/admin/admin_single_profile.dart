@@ -3,6 +3,8 @@ import 'package:exfactor/widgets/common/custom_button.dart';
 import 'package:flutter/material.dart';
 import '../../utils/colors.dart';
 import 'package:exfactor/services/superbase_service.dart';
+import 'package:exfactor/screens/admin/admin_manage_users.dart';
+import 'package:exfactor/widgets/utils_widget.dart';
 
 class AdminSingleProfileScreen extends StatefulWidget {
   final String userEmail;
@@ -140,31 +142,34 @@ class _AdminSingleProfileScreenState extends State<AdminSingleProfileScreen> {
                                     isLoading = true;
                                   });
                                   try {
-                                    final userIdInt =
-                                        int.tryParse(user!['id'].toString());
-                                    if (userIdInt != null) {
-                                      await SupabaseService
-                                          .deleteEmergencyContactsByUserId(
-                                              userIdInt);
+                                    final userIdInt = int.tryParse(
+                                        user!['member_id'].toString());
+                                    if (userIdInt == null) {
+                                      if (mounted) {
+                                        UserUtils.showToast(
+                                          "Error: member_id is null or invalid.",
+                                          Colors.red,
+                                          context,
+                                        );
+                                      }
+                                    } else {
                                       await SupabaseService.deleteUser(
                                           userIdInt);
                                       if (mounted) {
-                                        Navigator.of(context).pop(true);
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content: Text(
-                                                  'User removed successfully.')),
+                                        UserUtils.showToast(
+                                          "User removed successfully.",
+                                          Colors.green,
+                                          context,
                                         );
+                                        Navigator.of(context).pop();
                                       }
                                     }
                                   } catch (e) {
                                     if (mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                            content: Text(
-                                                'Failed to remove user: \\${e.toString()}')),
+                                      UserUtils.showToast(
+                                        "Failed to remove user: ${e.toString()}",
+                                        Colors.red,
+                                        context,
                                       );
                                     }
                                   } finally {

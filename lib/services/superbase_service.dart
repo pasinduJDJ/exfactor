@@ -113,7 +113,7 @@ class SupabaseService {
 
   // DELETE USER
   static Future<void> deleteUser(int userId) async {
-    await _client.from('user').delete().eq('id', userId);
+    await _client.from('user').delete().eq('member_id', userId);
   }
 
   // DELETE EMERGENCY CONTACTS BY USER ID

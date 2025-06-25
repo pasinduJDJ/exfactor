@@ -20,12 +20,210 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
   final _contactPersonController = TextEditingController();
   final _emailController = TextEditingController();
   final _mobileController = TextEditingController();
-  final _countryController = TextEditingController();
+  String? _selectedCountry;
   String? _selectedSupervisor;
   DateTime? _commencementDate;
   DateTime? _deliveryDate;
   bool _isLoading = false;
   List<Map<String, dynamic>> _supervisors = [];
+
+  // List of all countries
+  static const List<String> _countries = [
+    'Afghanistan',
+    'Albania',
+    'Algeria',
+    'Andorra',
+    'Angola',
+    'Antigua and Barbuda',
+    'Argentina',
+    'Armenia',
+    'Australia',
+    'Austria',
+    'Azerbaijan',
+    'Bahamas',
+    'Bahrain',
+    'Bangladesh',
+    'Barbados',
+    'Belarus',
+    'Belgium',
+    'Belize',
+    'Benin',
+    'Bhutan',
+    'Bolivia',
+    'Bosnia and Herzegovina',
+    'Botswana',
+    'Brazil',
+    'Brunei',
+    'Bulgaria',
+    'Burkina Faso',
+    'Burundi',
+    'Cabo Verde',
+    'Cambodia',
+    'Cameroon',
+    'Canada',
+    'Central African Republic',
+    'Chad',
+    'Chile',
+    'China',
+    'Colombia',
+    'Comoros',
+    'Congo (Congo-Brazzaville)',
+    'Costa Rica',
+    'Croatia',
+    'Cuba',
+    'Cyprus',
+    'Czechia (Czech Republic)',
+    'Democratic Republic of the Congo',
+    'Denmark',
+    'Djibouti',
+    'Dominica',
+    'Dominican Republic',
+    'Ecuador',
+    'Egypt',
+    'El Salvador',
+    'Equatorial Guinea',
+    'Eritrea',
+    'Estonia',
+    'Eswatini (fmr. "Swaziland")',
+    'Ethiopia',
+    'Fiji',
+    'Finland',
+    'France',
+    'Gabon',
+    'Gambia',
+    'Georgia',
+    'Germany',
+    'Ghana',
+    'Greece',
+    'Grenada',
+    'Guatemala',
+    'Guinea',
+    'Guinea-Bissau',
+    'Guyana',
+    'Haiti',
+    'Holy See',
+    'Honduras',
+    'Hungary',
+    'Iceland',
+    'India',
+    'Indonesia',
+    'Iran',
+    'Iraq',
+    'Ireland',
+    'Israel',
+    'Italy',
+    'Jamaica',
+    'Japan',
+    'Jordan',
+    'Kazakhstan',
+    'Kenya',
+    'Kiribati',
+    'Kuwait',
+    'Kyrgyzstan',
+    'Laos',
+    'Latvia',
+    'Lebanon',
+    'Lesotho',
+    'Liberia',
+    'Libya',
+    'Liechtenstein',
+    'Lithuania',
+    'Luxembourg',
+    'Madagascar',
+    'Malawi',
+    'Malaysia',
+    'Maldives',
+    'Mali',
+    'Malta',
+    'Marshall Islands',
+    'Mauritania',
+    'Mauritius',
+    'Mexico',
+    'Micronesia',
+    'Moldova',
+    'Monaco',
+    'Mongolia',
+    'Montenegro',
+    'Morocco',
+    'Mozambique',
+    'Myanmar (formerly Burma)',
+    'Namibia',
+    'Nauru',
+    'Nepal',
+    'Netherlands',
+    'New Zealand',
+    'Nicaragua',
+    'Niger',
+    'Nigeria',
+    'North Korea',
+    'North Macedonia',
+    'Norway',
+    'Oman',
+    'Pakistan',
+    'Palau',
+    'Palestine State',
+    'Panama',
+    'Papua New Guinea',
+    'Paraguay',
+    'Peru',
+    'Philippines',
+    'Poland',
+    'Portugal',
+    'Qatar',
+    'Romania',
+    'Russia',
+    'Rwanda',
+    'Saint Kitts and Nevis',
+    'Saint Lucia',
+    'Saint Vincent and the Grenadines',
+    'Samoa',
+    'San Marino',
+    'Sao Tome and Principe',
+    'Saudi Arabia',
+    'Senegal',
+    'Serbia',
+    'Seychelles',
+    'Sierra Leone',
+    'Singapore',
+    'Slovakia',
+    'Slovenia',
+    'Solomon Islands',
+    'Somalia',
+    'South Africa',
+    'South Korea',
+    'South Sudan',
+    'Spain',
+    'Sri Lanka',
+    'Sudan',
+    'Suriname',
+    'Sweden',
+    'Switzerland',
+    'Syria',
+    'Tajikistan',
+    'Tanzania',
+    'Thailand',
+    'Timor-Leste',
+    'Togo',
+    'Tonga',
+    'Trinidad and Tobago',
+    'Tunisia',
+    'Turkey',
+    'Turkmenistan',
+    'Tuvalu',
+    'Uganda',
+    'Ukraine',
+    'United Arab Emirates',
+    'United Kingdom',
+    'United States of America',
+    'Uruguay',
+    'Uzbekistan',
+    'Vanuatu',
+    'Venezuela',
+    'Vietnam',
+    'Yemen',
+    'Zambia',
+    'Zimbabwe'
+  ];
 
   @override
   void initState() {
@@ -69,7 +267,7 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
         contactPerson: _contactPersonController.text.trim(),
         contactPersonEmail: _emailController.text.trim(),
         contactPersonPhone: _mobileController.text.trim(),
-        clientCountry: _countryController.text.trim(),
+        clientCountry: _selectedCountry ?? '',
         projectStartDate: _commencementDate!.toIso8601String(),
         projectEndDate: _deliveryDate!.toIso8601String(),
         supervisor: _selectedSupervisor!,
@@ -114,7 +312,7 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
         iconTheme: const IconThemeData(color: kWhite),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Form(
           key: _formKey,
           child: Column(
@@ -132,12 +330,45 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
                   _contactPersonController, 'Enter Primary Contact Person'),
               const SizedBox(height: 12),
               _buildTextField(_emailController, 'Enter Contact Email',
-                  keyboardType: TextInputType.emailAddress),
+                  keyboardType: TextInputType.emailAddress, validator: (val) {
+                if (val == null || val.isEmpty) return 'Required';
+                final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
+                if (!emailRegex.hasMatch(val))
+                  return 'Enter a valid email address';
+                return null;
+              }),
               const SizedBox(height: 12),
               _buildTextField(_mobileController, 'Enter Contact  Mobile number',
-                  keyboardType: TextInputType.phone),
+                  keyboardType: TextInputType.phone, validator: (val) {
+                if (val == null || val.isEmpty) return 'Required';
+                final mobileRegex = RegExp(r'^(?:7|0|(?:\+94))[0-9]{9,10}$');
+                if (!mobileRegex.hasMatch(val))
+                  return 'Enter a valid mobile number';
+                return null;
+              }),
               const SizedBox(height: 12),
-              _buildTextField(_countryController, 'Enter Client Country'),
+              const Text('Select Country'),
+              DropdownButtonFormField<String>(
+                value: _selectedCountry,
+                items: _countries
+                    .map((country) => DropdownMenuItem(
+                          value: country,
+                          child: Text(country),
+                        ))
+                    .toList(),
+                onChanged: (val) => setState(() => _selectedCountry = val),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none),
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                ),
+                validator: (val) =>
+                    val == null || val.isEmpty ? 'Required' : null,
+              ),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -187,6 +418,7 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
                 onPressed: _handleSubmit,
                 isLoading: _isLoading,
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -195,63 +427,16 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
   }
 
   Widget _buildTextField(TextEditingController controller, String hint,
-      {TextInputType keyboardType = TextInputType.text}) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        hintText: hint,
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-      ),
-      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
-    );
-  }
-
-  Widget _buildDropdown(String hint, List<String> items, String? value,
-      ValueChanged<String?> onChanged) {
-    return DropdownButtonFormField<String>(
-      value: value,
-      hint: Text(hint),
-      items:
-          items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none),
-        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-      ),
-      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
-    );
-  }
-
-  Widget _buildDateField(
-      String label, DateTime? date, Function(DateTime) onDateSelected) {
-    return GestureDetector(
-      onTap: () async {
-        //DateTime now = DateTime.now();
-        final DateTime? picked = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(2025),
-          lastDate: DateTime(2030),
-        );
-        if (picked != null) {
-          onDateSelected(picked);
-        }
-      },
-      child: AbsorbPointer(
-        child: TextFormField(
+      {TextInputType keyboardType = TextInputType.text,
+      String? Function(String?)? validator}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(hint),
+        TextFormField(
+          controller: controller,
+          keyboardType: keyboardType,
           decoration: InputDecoration(
-            hintText: label,
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(
@@ -259,15 +444,78 @@ class _AdminAddProjectScreenState extends State<AdminAddProjectScreen> {
                 borderSide: BorderSide.none),
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-            suffixIcon: const Icon(Icons.calendar_today, size: 20),
           ),
-          controller: TextEditingController(
-              text: date == null
-                  ? ''
-                  : '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}'),
-          validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+          validator: validator,
+        )
+      ],
+    );
+  }
+
+  Widget _buildDropdown(String hint, List<String> items, String? value,
+      ValueChanged<String?> onChanged) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(hint),
+      DropdownButtonFormField<String>(
+        value: value,
+        items: items
+            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+            .toList(),
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
         ),
-      ),
+        validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+      )
+    ]);
+  }
+
+  Widget _buildDateField(
+      String label, DateTime? date, Function(DateTime) onDateSelected) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label),
+        GestureDetector(
+          onTap: () async {
+            //DateTime now = DateTime.now();
+            final DateTime? picked = await showDatePicker(
+              context: context,
+              initialDate: DateTime.now(),
+              firstDate: DateTime(2025),
+              lastDate: DateTime(2030),
+            );
+            if (picked != null) {
+              onDateSelected(picked);
+            }
+          },
+          child: AbsorbPointer(
+            child: TextFormField(
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                suffixIcon: const Icon(Icons.calendar_today, size: 20),
+              ),
+              controller: TextEditingController(
+                  text: date == null
+                      ? ''
+                      : '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}'),
+              validator: (val) =>
+                  val == null || val.isEmpty ? 'Required' : null,
+            ),
+          ),
+        )
+      ],
     );
   }
 }

@@ -18,10 +18,11 @@ class AdminHome extends StatefulWidget {
 class _AdminHomeState extends State<AdminHome> {
   bool showLiveProject = false;
   bool showPending = false;
-  bool showProgress = true;
+  bool showProgress = false;
   bool showOverdue = false;
   bool showComplete = false;
   bool showOverDueTask = false;
+  bool showPendingTask = false;
 
   int liveProjectCount = 0;
   int overdueTaskCount = 0;
@@ -33,6 +34,7 @@ class _AdminHomeState extends State<AdminHome> {
   List<Map<String, dynamic>> onProgressTask = [];
   List<Map<String, dynamic>> teamMembers = [];
   List<Map<String, dynamic>> overDueTask = [];
+  List<Map<String, dynamic>> pendingTask = [];
 
   @override
   void initState() {
@@ -76,6 +78,11 @@ class _AdminHomeState extends State<AdminHome> {
       return status == 'on progress' || status == 'progress';
     }).length;
 
+    pendingTask = tasks.where((t) {
+      final status = (t['status'] ?? '').toString().toLowerCase();
+      return status == 'pending';
+    }).toList();
+
     onProgressTask = tasks.where((t) {
       final status = (t['status'] ?? '').toString().toLowerCase();
       return status == 'on progress' || status == 'progress';
@@ -107,14 +114,14 @@ class _AdminHomeState extends State<AdminHome> {
       {
         'label': 'Live Project',
         'count': liveProjectCount,
-        'color': const Color(0xFF25253F)
+        'color': kPrimaryColor
       },
-      {'label': 'OVER DUE', 'count': overdueTaskCount, 'color': Colors.red},
-      {'label': 'PENDING', 'count': pendingTaskCount, 'color': Colors.amber},
+      {'label': 'OVER DUE', 'count': overdueTaskCount, 'color': cardRed},
+      {'label': 'PENDING', 'count': pendingTaskCount, 'color': cardYellow},
       {
         'label': 'ON PROGRESS',
         'count': onProgressTaskCount,
-        'color': Colors.green
+        'color': cardGreen
       },
     ];
     return SingleChildScrollView(
@@ -125,9 +132,20 @@ class _AdminHomeState extends State<AdminHome> {
             ? const Center(child: CircularProgressIndicator())
             : UserUtils.buildStatusSummaryCard(statusItems),
         const SizedBox(height: 30),
+        const Row(
+          children: [
+            Text(
+              "Current On going Project",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            )
+          ],
+        ),
+        const SizedBox(
+          height: 10,
+        ),
         UserUtils.buildExpandableGroup(
           title: "Live Project",
-          color: cardDarkGreen,
+          color: kPrimaryColor,
           expanded: showLiveProject,
           onToggle: () => setState(() => showLiveProject = !showLiveProject),
           groupList: liveProjects,
@@ -140,6 +158,17 @@ class _AdminHomeState extends State<AdminHome> {
               ),
             );
           },
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        const Row(
+          children: [
+            Text(
+              "Manage Task Profile",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            )
+          ],
         ),
         const SizedBox(
           height: 10,
@@ -166,9 +195,28 @@ class _AdminHomeState extends State<AdminHome> {
         UserUtils.buildExpandableGroup(
           title: "On Progress Task",
           color: cardGreen,
-          expanded: showOverdue,
-          onToggle: () => setState(() => showOverdue = !showOverdue),
+          expanded: showProgress,
+          onToggle: () => setState(() => showProgress = !showProgress),
           groupList: onProgressTask,
+          onSeeMore: (task) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AdminSingleTaskScreen(
+                    taskId: task['task_id']?.toString() ?? ''),
+              ),
+            );
+          },
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        UserUtils.buildExpandableGroup(
+          title: "Pending Task",
+          color: cardYellow,
+          expanded: showPending,
+          onToggle: () => setState(() => showPending = !showPending),
+          groupList: pendingTask,
           onSeeMore: (task) {
             Navigator.push(
               context,
@@ -193,11 +241,24 @@ class _AdminHomeState extends State<AdminHome> {
           height: 48,
           icon: Icon(Icons.assignment_turned_in_outlined),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(
+          height: 20,
+        ),
+        const Row(
+          children: [
+            Text(
+              "Exfactor Team Members",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            )
+          ],
+        ),
+        const SizedBox(
+          height: 10,
+        ),
         Container(
           width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.orange,
+          decoration: const BoxDecoration(
+            color: cardOrenge,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(12),
               topRight: Radius.circular(12),
@@ -205,7 +266,7 @@ class _AdminHomeState extends State<AdminHome> {
           ),
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           child: const Text(
-            'Current Exfactor Team',
+            '',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -215,7 +276,7 @@ class _AdminHomeState extends State<AdminHome> {
         ),
         Container(
           width: double.infinity,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(12),

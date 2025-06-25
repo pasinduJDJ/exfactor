@@ -48,7 +48,6 @@ class _SupervisorProfileScreenState extends State<SupervisorProfileScreen> {
                     'Join Date': widget.user.joinDate.toString(),
                     'Designation Date': widget.user.designationDate.toString(),
                     'Supervisor': widget.user.supervisor ?? '',
-                    'Position': widget.user.position,
                   }),
                   const SizedBox(height: 16),
                   _infoCard({

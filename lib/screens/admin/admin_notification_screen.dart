@@ -23,6 +23,8 @@ class _AdminNotificationScreenBody extends StatefulWidget {
 class _AdminNotificationScreenBodyState
     extends State<_AdminNotificationScreenBody> {
   List<Map<String, dynamic>> notifications = [];
+  List<Map<String, dynamic>> todayNotifications = [];
+  List<Map<String, dynamic>> futureNotifications = [];
   bool isLoading = true;
 
   @override
@@ -34,8 +36,32 @@ class _AdminNotificationScreenBodyState
   Future<void> fetchNotifications() async {
     try {
       final fetchedNotifications = await SupabaseService.getAllNotifications();
+      notifications = fetchedNotifications;
+      todayNotifications.clear();
+      futureNotifications.clear();
+
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+
+      for (var n in notifications) {
+        final dateStr = n['schedule_date'] ?? '';
+        if (dateStr.isEmpty) continue;
+        DateTime? notifDate;
+        try {
+          notifDate = DateTime.parse(dateStr);
+        } catch (_) {
+          continue;
+        }
+        final notifDay =
+            DateTime(notifDate.year, notifDate.month, notifDate.day);
+        if (notifDay == today) {
+          todayNotifications.add(n);
+        } else if (notifDay.isAfter(today)) {
+          futureNotifications.add(n);
+        }
+      }
+
       setState(() {
-        notifications = fetchedNotifications;
         isLoading = false;
       });
     } catch (e) {
@@ -72,11 +98,28 @@ class _AdminNotificationScreenBodyState
           const Row(
             children: [
               Text(
-                "NOIFICATION ",
+                "Notification ",
                 style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1),
+              )
+            ],
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          const Row(
+            children: [
+              Text(
+                "To day Notification ",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               )
             ],
           ),
@@ -86,7 +129,44 @@ class _AdminNotificationScreenBodyState
           isLoading
               ? const CircularProgressIndicator()
               : NotificationCard.buildNotificationCards(
-                  notifications
+                  todayNotifications
+                      .map((n) => {
+                            'notification_id': n['notification_id'],
+                            'title': n['title'] ?? '',
+                            'subtitle': n['message'] ?? '',
+                            'type': n['type'] ?? '',
+                            'submission_date': n['schedule_date'] ?? '',
+                          })
+                      .toList(),
+                  onDelete: (int notificationId) async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    await SupabaseService.deleteNotification(notificationId);
+                    await fetchNotifications();
+                  },
+                ),
+          const SizedBox(
+            height: 20,
+          ),
+          const Row(
+            children: [
+              Text(
+                "Future Notification ",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              )
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          isLoading
+              ? const CircularProgressIndicator()
+              : NotificationCard.buildNotificationCards(
+                  futureNotifications
                       .map((n) => {
                             'notification_id': n['notification_id'],
                             'title': n['title'] ?? '',

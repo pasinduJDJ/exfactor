@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:exfactor/models/task_model.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class UserUtils {
   // Summary card
@@ -147,6 +148,21 @@ class UserUtils {
           ),
         ),
       ],
+    );
+  }
+
+  static void showToast(
+    String message,
+    Color color,
+    BuildContext context,
+  ) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: color,
+      textColor: Colors.white,
+      fontSize: 14.0,
     );
   }
 

@@ -150,7 +150,7 @@ class _AdminAddTaskScreenState extends State<AdminAddTaskScreen> {
         iconTheme: const IconThemeData(color: kWhite),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppConstants.defaultPadding),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Form(
           key: _formKey,
           child: Column(
@@ -180,6 +180,7 @@ class _AdminAddTaskScreenState extends State<AdminAddTaskScreen> {
                 onPressed: _handleSubmit,
                 isLoading: _isLoading,
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -225,7 +226,7 @@ class _AdminAddTaskScreenState extends State<AdminAddTaskScreen> {
           items: items
               .map((e) => DropdownMenuItem(
                   value: '${e['title']} (ID: ${e['project_id']})',
-                  child: Text('${e['title']} (ID: ${e['project_id']})')))
+                  child: Text('${e['title']} ')))
               .toList(),
           onChanged: onChanged,
           decoration: InputDecoration(
@@ -281,8 +282,7 @@ class _AdminAddTaskScreenState extends State<AdminAddTaskScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(hint, style: TextStyle(fontSize: 16, color: Colors.grey[700])),
-        const SizedBox(height: 8),
+        //Text(hint, style: TextStyle(fontSize: 16, color: Colors.grey[700])),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -291,7 +291,6 @@ class _AdminAddTaskScreenState extends State<AdminAddTaskScreen> {
           ),
           child: Column(
             children: [
-              // Selected members display
               if (selectedMembers.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.all(12),

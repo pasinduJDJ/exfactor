@@ -10,8 +10,8 @@ const Color kWhite = Color(0xffffffff);
 const Color cardLightBlue = Color(0xff0077FF);
 const Color cardGreen = Color(0xff3E8914);
 const Color cardRed = Color(0xffC2131F);
-const Color cardYellow = Color(0xffEDBD59);
-const Color cardOrenge = Color(0xffF77F00);
+const Color cardYellow = Color.fromARGB(255, 247, 168, 0);
+const Color cardOrenge = Color.fromARGB(255, 179, 92, 0);
 
 const Color cardDarkRed = Color(0xff7D0A12);
 const Color cardDarkYellow = Color(0xffEDBD59);
