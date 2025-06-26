@@ -1,38 +1,39 @@
 class UserModel {
   final String? userId;
-  final String firstName;
-  final String lastName;
-  final String email;
-  final String mobile;
-  final DateTime birthday;
-  final DateTime joinDate;
-  final DateTime designationDate;
-  final String role;
-  final String profileImage;
+  final String? firstName;
+  final String? lastName;
+  final String? email;
+  final String? mobile;
+  final String? birthday;
+  final String? joinDate;
+  final String? designationDate;
+  final String? role;
+  final String? profileImage;
   final String? supervisor;
-  final String emergencyName;
-  final String emergencyMobileNumber;
-  final String emergencyRelationship;
-  final String position;
+  final String? emergencyName;
+  final String? emergencyMobileNumber;
+  final String? emergencyRelationship;
+  final String? position;
   final int memberId;
 
-  UserModel(
-      {this.userId,
-      required this.firstName,
-      required this.lastName,
-      required this.email,
-      required this.mobile,
-      required this.birthday,
-      required this.joinDate,
-      required this.designationDate,
-      required this.role,
-      required this.profileImage,
-      this.supervisor,
-      required this.emergencyName,
-      required this.emergencyMobileNumber,
-      required this.emergencyRelationship,
-      required this.position,
-      required this.memberId});
+  UserModel({
+    this.userId,
+    this.firstName,
+    this.lastName,
+    this.email,
+    this.mobile,
+    this.birthday,
+    this.joinDate,
+    this.designationDate,
+    this.role,
+    this.profileImage,
+    this.supervisor,
+    this.emergencyName,
+    this.emergencyMobileNumber,
+    this.emergencyRelationship,
+    this.position,
+    required this.memberId,
+  });
 
   Map<String, dynamic> toMap() {
     return {
@@ -41,9 +42,9 @@ class UserModel {
       'last_name': lastName,
       'email': email,
       'mobile': mobile,
-      'birthday': birthday.toIso8601String(),
-      'join_date': joinDate.toIso8601String(),
-      'designation_date': designationDate.toIso8601String(),
+      'birthday': birthday,
+      'join_date': joinDate,
+      'designation_date': designationDate,
       'role': role,
       'profile_image': profileImage,
       'supervisor': supervisor,
@@ -51,28 +52,30 @@ class UserModel {
       'emergency_number': emergencyMobileNumber,
       'emergency_relationship': emergencyRelationship,
       'position': position,
-      'member_id': memberId
+      'member_id': memberId,
     };
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       userId: map['id'],
-      firstName: map['first_name'] ?? '',
-      lastName: map['last_name'] ?? '',
-      email: map['email'] ?? '',
-      mobile: map['mobile'] ?? '',
-      birthday: DateTime.parse(map['birthday']),
-      joinDate: DateTime.parse(map['join_date']),
-      designationDate: DateTime.parse(map['designation_date']),
-      role: map['role'] ?? '',
-      profileImage: map['profile_image'] ?? '',
+      firstName: map['first_name'],
+      lastName: map['last_name'],
+      email: map['email'],
+      mobile: map['mobile'],
+      birthday: map['birthday']?.toString(),
+      joinDate: map['join_date']?.toString(),
+      designationDate: map['designation_date']?.toString(),
+      role: map['role'],
+      profileImage: map['profile_image'],
       supervisor: map['supervisor'],
-      emergencyName: map['emergency_name'] ?? '',
-      emergencyMobileNumber: map['emergency_number'] ?? '',
-      emergencyRelationship: map['emergency_relationship'] ?? '',
-      position: map['position'] ?? '',
-      memberId: map['member_id'] ?? '',
+      emergencyName: map['emergency_name'],
+      emergencyMobileNumber: map['emergency_number'],
+      emergencyRelationship: map['emergency_relationship'],
+      position: map['position'],
+      memberId: map['member_id'] is int
+          ? map['member_id']
+          : int.tryParse(map['member_id']?.toString() ?? '0') ?? 0,
     );
   }
 
@@ -82,9 +85,9 @@ class UserModel {
     String? lastName,
     String? email,
     String? mobile,
-    DateTime? birthday,
-    DateTime? joinDate,
-    DateTime? designationDate,
+    String? birthday,
+    String? joinDate,
+    String? designationDate,
     String? role,
     String? profileImage,
     String? supervisor,

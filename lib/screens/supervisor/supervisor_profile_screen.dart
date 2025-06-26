@@ -3,6 +3,8 @@ import 'package:exfactor/screens/login_page.dart';
 import 'package:exfactor/utils/colors.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/common/custom_button.dart';
+import 'supervisor_update_user.dart';
+import '../../services/superbase_service.dart';
 
 class SupervisorProfileScreen extends StatefulWidget {
   final UserModel user;
@@ -15,8 +17,36 @@ class SupervisorProfileScreen extends StatefulWidget {
 }
 
 class _SupervisorProfileScreenState extends State<SupervisorProfileScreen> {
+  late UserModel _user;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _user = widget.user;
+    _fetchUser();
+  }
+
+  Future<void> _fetchUser() async {
+    setState(() => _loading = true);
+    final data = await SupabaseService.getUserByMemberId(_user.memberId);
+    if (data != null) {
+      setState(() {
+        _user = UserModel.fromMap(data);
+        _loading = false;
+      });
+    } else {
+      setState(() => _loading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     return Scaffold(
       backgroundColor: const Color(0xFFDCEAF5),
       body: SingleChildScrollView(
@@ -28,7 +58,7 @@ class _SupervisorProfileScreenState extends State<SupervisorProfileScreen> {
             CircleAvatar(
               radius: 70,
               backgroundColor: Colors.white,
-              backgroundImage: AssetImage(widget.user.profileImage),
+              backgroundImage: AssetImage(_user.profileImage ?? ''),
             ),
 
             const SizedBox(height: 16),
@@ -39,26 +69,35 @@ class _SupervisorProfileScreenState extends State<SupervisorProfileScreen> {
               child: Column(
                 children: [
                   _infoCard({
-                    'First Name': widget.user.firstName,
-                    'Last Name': widget.user.lastName,
-                    'Position': widget.user.position,
-                    'Email Address': widget.user.email,
-                    'Mobile Number': widget.user.mobile,
-                    'Date Of Birth': widget.user.birthday.toString(),
-                    'Join Date': widget.user.joinDate.toString(),
-                    'Designation Date': widget.user.designationDate.toString(),
-                    'Supervisor': widget.user.supervisor ?? '',
+                    'First Name': _user.firstName ?? '',
+                    'Last Name': _user.lastName ?? '',
+                    'Position': _user.position ?? '',
+                    'Email Address': _user.email ?? '',
+                    'Mobile Number': _user.mobile ?? '',
+                    'Date Of Birth': _user.birthday ?? '',
+                    'Join Date': _user.joinDate ?? '',
+                    'Designation Date': _user.designationDate ?? '',
+                    'Supervisor': _user.supervisor ?? '',
                   }),
                   const SizedBox(height: 16),
                   _infoCard({
-                    'Name': widget.user.emergencyName,
-                    'Contact Number': widget.user.emergencyMobileNumber,
-                    'Relationship': widget.user.emergencyRelationship,
+                    'Name': _user.emergencyName ?? '',
+                    'Contact Number': _user.emergencyMobileNumber ?? '',
+                    'Relationship': _user.emergencyRelationship ?? '',
                   }),
                   const SizedBox(height: 16),
                   CustomButton(
                     text: "Update",
-                    onPressed: () {},
+                    onPressed: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => SupervisorUpdateUserScreen(
+                              memberId: _user.memberId),
+                        ),
+                      );
+                      await _fetchUser();
+                    },
                     backgroundColor: cardGreen,
                     width: double.infinity,
                   ),

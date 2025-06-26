@@ -69,8 +69,8 @@ class _SupervisorMainScreenState extends State<SupervisorMainScreen> {
   @override
   Widget build(BuildContext context) {
     return BaseLayout(
-      title: "${widget.user.firstName}",
-      subtitle: widget.user.position,
+      title: "${widget.user.firstName ?? ''}",
+      subtitle: widget.user.position ?? '',
       profileImage: 'assets/images/man-avatar.png',
       onProfileTap: () {
         // TODO: Implement profile action

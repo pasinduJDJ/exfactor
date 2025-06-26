@@ -233,4 +233,56 @@ class SupabaseService {
         .maybeSingle();
     return response;
   }
+
+  // Minimal user registration for admin
+  static Future<void> insertUser(Map<String, dynamic> userData) async {
+    // Ensure all required fields are present
+    if (userData['member_id'] == null ||
+        userData['first_name'] == null ||
+        userData['email'] == null ||
+        userData['password'] == null) {
+      throw Exception('Missing required user fields');
+    }
+    final data = {
+      'member_id': userData['member_id'],
+      'first_name': userData['first_name'],
+      'email': userData['email'],
+      'password': userData['password'],
+      // All other fields set to empty string or null
+      'last_name': '',
+      'mobile': '',
+      'birthday': null,
+      'join_date': null,
+      'designation_date': null,
+      'role': userData['role'] ?? '',
+      'supervisor': null,
+      'emergency_name': '',
+      'emergency_number': '',
+      'emergency_relationship': '',
+      'position': '',
+    };
+    await _client.from('user').insert(data);
+  }
+
+  // Update user profile by member_id (int)
+  static Future<void> updateUserProfile(
+      Map<String, dynamic> updatedData) async {
+    if (updatedData['member_id'] == null) {
+      throw Exception('member_id is required for profile update');
+    }
+    final data = Map<String, dynamic>.from(updatedData);
+    data.remove('user_id'); // Don't update the uuid
+    data.remove('member_id'); // Don't update memberId
+    await _client
+        .from('user')
+        .update(data)
+        .eq('member_id', updatedData['member_id']);
+  }
+
+  // Get user by user_id (uuid)
+  static Future<Map<String, dynamic>?> getUserById(String userId) async {
+    final response =
+        await _client.from('user').select().eq('id', userId).maybeSingle();
+    return response;
+  }
 }

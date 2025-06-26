@@ -69,8 +69,8 @@ class _TechnicalMainScreenState extends State<TechnicalMainScreen> {
   @override
   Widget build(BuildContext context) {
     return BaseLayout(
-      title: widget.user.firstName,
-      subtitle: widget.user.position,
+      title: widget.user.firstName ?? '',
+      subtitle: widget.user.position ?? '',
       profileImage: 'assets/images/man-avatar.png',
       onProfileTap: () {},
       body: _screens[_currentIndex],
