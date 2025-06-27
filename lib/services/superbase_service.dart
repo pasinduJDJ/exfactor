@@ -285,4 +285,25 @@ class SupabaseService {
         await _client.from('user').select().eq('id', userId).maybeSingle();
     return response;
   }
+
+  // Update project status by projectId
+  static Future<void> updateProjectStatus(
+      int projectId, String newStatus) async {
+    await _client
+        .from('project')
+        .update({'status': newStatus}).eq('project_id', projectId);
+  }
+
+  static Future<int> getTodaysNotificationCount(int userId) async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+    final response = await _client
+        .from('notification')
+        .select()
+        .eq('user_id', userId)
+        .gte('schedule_date', today.toIso8601String())
+        .lt('schedule_date', tomorrow.toIso8601String());
+    return (response as List).length;
+  }
 }

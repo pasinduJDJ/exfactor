@@ -110,15 +110,22 @@ class _AddUserScreenState extends State<AddUserScreen> {
               ),
               const SizedBox(height: 20),
               TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  hintText: 'Enter Email Address',
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.emailAddress,
-              ),
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter Email Address',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (val) {
+                    if (val == null || val.isEmpty) return 'Required';
+                    final emailRegex =
+                        RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
+                    if (!emailRegex.hasMatch(val))
+                      return 'Enter a valid email address';
+                    return null;
+                  }),
               const SizedBox(height: 20),
               DropdownButtonFormField<String>(
                 value: _selectedRole,

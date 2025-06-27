@@ -101,10 +101,10 @@ class _TechnicalHomeState extends State<TechnicalHome> {
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> statusItems = [
-      {'label': 'OVER DUE', 'count': overdueCount, 'color': cardRed},
       {'label': 'PENDING', 'count': pendingCount, 'color': cardYellow},
-      {'label': 'IN PROGRESS', 'count': progressCount, 'color': cardGreen},
+      {'label': 'WORKING', 'count': progressCount, 'color': cardGreen},
       {'label': 'COMPLETE', 'count': completeCount, 'color': cardLightBlue},
+      {'label': 'OVER DUE', 'count': overdueCount, 'color': cardRed},
     ];
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 10),

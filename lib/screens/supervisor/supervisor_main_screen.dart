@@ -71,10 +71,8 @@ class _SupervisorMainScreenState extends State<SupervisorMainScreen> {
     return BaseLayout(
       title: "${widget.user.firstName ?? ''}",
       subtitle: widget.user.position ?? '',
-      profileImage: 'assets/images/man-avatar.png',
-      onProfileTap: () {
-        // TODO: Implement profile action
-      },
+      profileImage: 'assets/images/manager-avatar.webp',
+      onProfileTap: () {},
       body: _screens[_currentIndex],
       currentIndex: _currentIndex,
       onIndexChanged: (index) => setState(() => _currentIndex = index),

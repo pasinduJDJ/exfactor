@@ -15,6 +15,8 @@ class AdminSingleTaskScreen extends StatefulWidget {
 class _AdminSingleTaskScreenState extends State<AdminSingleTaskScreen> {
   Map<String, dynamic>? task;
   bool isLoading = true;
+  String? supervisorName;
+  String? projectTitle;
 
   @override
   void initState() {
@@ -34,10 +36,45 @@ class _AdminSingleTaskScreenState extends State<AdminSingleTaskScreen> {
       final data = await SupabaseService.getAllTasks();
       final t = data.firstWhere((t) => t['task_id'].toString() == widget.taskId,
           orElse: () => {});
-      setState(() {
-        task = t.isNotEmpty ? t : null;
-        isLoading = false;
-      });
+      if (t.isNotEmpty) {
+        // Fetch supervisor name
+        String? supName;
+        if (t['supervisor_id'] != null) {
+          final sup = await SupabaseService.getUserByMemberId(
+            t['supervisor_id'] is int
+                ? t['supervisor_id']
+                : int.tryParse(t['supervisor_id'].toString()) ?? 0,
+          );
+          if (sup != null) {
+            supName =
+                ((sup['first_name'] ?? '') + ' ' + (sup['last_name'] ?? ''))
+                    .trim();
+          }
+        }
+        // Fetch project title
+        String? projTitle;
+        if (t['p_id'] != null) {
+          final proj = await SupabaseService.getProjectById(
+            t['p_id'] is int
+                ? t['p_id']
+                : int.tryParse(t['p_id'].toString()) ?? 0,
+          );
+          if (proj != null) {
+            projTitle = proj['title'] ?? '';
+          }
+        }
+        setState(() {
+          task = t;
+          supervisorName = supName;
+          projectTitle = projTitle;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          task = null;
+          isLoading = false;
+        });
+      }
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -50,7 +87,7 @@ class _AdminSingleTaskScreenState extends State<AdminSingleTaskScreen> {
     return Scaffold(
       backgroundColor: KbgColor,
       appBar: AppBar(
-        title: const Text('Single Task',
+        title: const Text('Mange Task',
             style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: kPrimaryColor,
         foregroundColor: kWhite,
@@ -63,73 +100,74 @@ class _AdminSingleTaskScreenState extends State<AdminSingleTaskScreen> {
           ),
         ],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : task == null
-              ? const Center(child: Text('Task not found'))
-              : Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16)),
-                        elevation: 4,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Container(
-                              decoration: const BoxDecoration(
-                                color: cardGreen,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(16),
-                                  topRight: Radius.circular(16),
+      body: SingleChildScrollView(
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : task == null
+                ? const Center(child: Text('Task not found'))
+                : Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Card(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
+                          elevation: 4,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                decoration: const BoxDecoration(
+                                  color: kPrimaryColor,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(16),
+                                    topRight: Radius.circular(16),
+                                  ),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 12, horizontal: 16),
+                                child: Text('$projectTitle',
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        color: kWhite,
+                                        fontWeight: FontWeight.bold)),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _infoRow('Task Title',
+                                        task!['title']?.toString() ?? ''),
+                                    const Divider(thickness: 1),
+                                    _infoRow('Supervisor name',
+                                        supervisorName ?? ''),
+                                    const Divider(thickness: 1),
+                                    _infoRow('Commencement Date',
+                                        task!['start_date'] ?? ''),
+                                    const Divider(thickness: 1),
+                                    _infoRow('Expected Delivery Date',
+                                        task!['end_date'] ?? ''),
+                                    const Divider(thickness: 1),
+                                    _infoRow('Status', task!['status'] ?? ''),
+                                  ],
                                 ),
                               ),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 16),
-                              child: Text(
-                                  'Task Title : ${task!['title'] ?? ''}',
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold)),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _infoRow('Project Title',
-                                      task!['title']?.toString() ?? ''),
-                                  const Divider(thickness: 1),
-                                  _infoRow('Commencement Date',
-                                      task!['start_date'] ?? ''),
-                                  const Divider(thickness: 1),
-                                  _infoRow('Expected Delivery Date',
-                                      task!['end_date'] ?? ''),
-                                  const Divider(thickness: 1),
-                                  _infoRow('Supervisor name',
-                                      task!['supervisor'] ?? ''),
-                                  const Divider(thickness: 1),
-                                  _infoRow('Status', task!['status'] ?? ''),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
-                                child: CustomButton(
-                                  text: "Remove",
-                                  onPressed: () {},
-                                  backgroundColor: cardDarkRed,
-                                )),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                        Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: CustomButton(
+                              text: "Remove",
+                              onPressed: () {},
+                              backgroundColor: cardDarkRed,
+                            )),
+                      ],
+                    ),
                   ),
-                ),
+      ),
     );
   }
 
@@ -139,7 +177,8 @@ class _AdminSingleTaskScreenState extends State<AdminSingleTaskScreen> {
       child: Row(
         children: [
           Text('$label : ',
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           Expanded(child: Text(value)),
         ],
       ),

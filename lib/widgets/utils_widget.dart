@@ -1,6 +1,4 @@
 import 'dart:ui';
-
-import 'package:exfactor/models/task_model.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -165,56 +163,4 @@ class UserUtils {
       fontSize: 14.0,
     );
   }
-
-  //Static Group weight
-  // static Widget buildGroup(String title, Color color, List<Task> groupTasks,
-  //     ValueChanged<Task> onSeeMore) {
-  //   return Card(
-  //     elevation: 3,
-  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-  //     margin: const EdgeInsets.symmetric(
-  //       vertical: 8,
-  //     ),
-  //     child: Column(
-  //       children: [
-  //         Container(
-  //           width: double.infinity,
-  //           decoration: BoxDecoration(
-  //             color: color,
-  //             borderRadius:
-  //                 const BorderRadius.vertical(top: Radius.circular(12)),
-  //           ),
-  //           padding: const EdgeInsets.all(12),
-  //           child: Row(
-  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //             children: [
-  //               Text(
-  //                 title,
-  //                 style: const TextStyle(
-  //                     color: Colors.white,
-  //                     fontSize: 14,
-  //                     fontWeight: FontWeight.bold),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //         ListView.builder(
-  //           shrinkWrap: true,
-  //           physics: const NeverScrollableScrollPhysics(),
-  //           itemCount: groupTasks.length,
-  //           itemBuilder: (context, index) {
-  //             final task = groupTasks[index];
-  //             return ListTile(
-  //               title: Text(task.title),
-  //               trailing: TextButton(
-  //                 onPressed: () => onSeeMore(task),
-  //                 child: const Text("See more.."),
-  //               ),
-  //             );
-  //           },
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }

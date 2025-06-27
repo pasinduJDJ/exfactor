@@ -19,12 +19,14 @@ class SupervisorProfileScreen extends StatefulWidget {
 class _SupervisorProfileScreenState extends State<SupervisorProfileScreen> {
   late UserModel _user;
   bool _loading = true;
+  String? supervisorName;
 
   @override
   void initState() {
     super.initState();
     _user = widget.user;
     _fetchUser();
+    _fetchSupervisorName();
   }
 
   Future<void> _fetchUser() async {
@@ -40,46 +42,80 @@ class _SupervisorProfileScreenState extends State<SupervisorProfileScreen> {
     }
   }
 
+  Future<void> _fetchSupervisorName() async {
+    if (_user.supervisor != null && _user.supervisor!.isNotEmpty) {
+      final allUsers = await SupabaseService.getAllUsers();
+      final sup = allUsers.firstWhere(
+        (u) => u['member_id'].toString() == _user.supervisor,
+        orElse: () => {},
+      );
+      if (sup != null) {
+        setState(() {
+          supervisorName =
+              ((sup['first_name'] ?? '') + ' ' + (sup['last_name'] ?? ''))
+                  .trim();
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
     return Scaffold(
-      backgroundColor: const Color(0xFFDCEAF5),
+      backgroundColor: const Color(0xFFe9ecef),
       body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 10),
         child: Column(
           children: [
             const SizedBox(height: 16),
-
-            //Avatar
-            CircleAvatar(
+            const CircleAvatar(
               radius: 70,
               backgroundColor: Colors.white,
-              backgroundImage: AssetImage(_user.profileImage ?? ''),
+              backgroundImage: AssetImage('assets/images/manager-avatar.webp'),
             ),
-
             const SizedBox(height: 16),
-
-            // User Info Card
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Text(
+                    "Personal Information",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   _infoCard({
                     'First Name': _user.firstName ?? '',
                     'Last Name': _user.lastName ?? '',
-                    'Position': _user.position ?? '',
-                    'Email Address': _user.email ?? '',
-                    'Mobile Number': _user.mobile ?? '',
                     'Date Of Birth': _user.birthday ?? '',
-                    'Join Date': _user.joinDate ?? '',
-                    'Designation Date': _user.designationDate ?? '',
-                    'Supervisor': _user.supervisor ?? '',
                   }),
                   const SizedBox(height: 16),
+                  const Text(
+                    "Company Information",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  _infoCard({
+                    'Position': _user.position ?? '',
+                    'Role': _user.role ?? '',
+                    'Email Address': _user.email ?? '',
+                    'Mobile Number': _user.mobile ?? '',
+                    'Join Date': _user.joinDate ?? '',
+                    'Designation Date': _user.designationDate ?? '',
+                    'Supervisor': supervisorName ?? '',
+                  }),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Emergency Contact Information",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   _infoCard({
                     'Name': _user.emergencyName ?? '',
                     'Contact Number': _user.emergencyMobileNumber ?? '',

@@ -111,18 +111,13 @@ class _AdminHomeState extends State<AdminHome> {
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> statusItems = [
-      {
-        'label': 'Live Project',
-        'count': liveProjectCount,
-        'color': kPrimaryColor
-      },
-      {'label': 'OVER DUE', 'count': overdueTaskCount, 'color': cardRed},
       {'label': 'PENDING', 'count': pendingTaskCount, 'color': cardYellow},
       {
         'label': 'ON PROGRESS',
         'count': onProgressTaskCount,
         'color': cardGreen
       },
+      {'label': 'OVER DUE', 'count': overdueTaskCount, 'color': cardRed},
     ];
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -193,7 +188,7 @@ class _AdminHomeState extends State<AdminHome> {
           height: 10,
         ),
         UserUtils.buildExpandableGroup(
-          title: "On Progress Task",
+          title: "In Progress Task",
           color: cardGreen,
           expanded: showProgress,
           onToggle: () => setState(() => showProgress = !showProgress),
@@ -243,83 +238,6 @@ class _AdminHomeState extends State<AdminHome> {
         ),
         const SizedBox(
           height: 20,
-        ),
-        const Row(
-          children: [
-            Text(
-              "Exfactor Team Members",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            )
-          ],
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        Container(
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            color: cardOrenge,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-            ),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-          child: const Text(
-            '',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-        ),
-        Container(
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(12),
-              bottomRight: Radius.circular(12),
-            ),
-            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-          child: teamMembers.isEmpty
-              ? const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('No team members found.'),
-                )
-              : Column(
-                  children: teamMembers
-                      .map((user) => Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  '${user['first_name'] ?? ''} ${user['last_name'] ?? ''}',
-                                  style: const TextStyle(fontSize: 15),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          AdminSingleProfileScreen(
-                                        userEmail:
-                                            user['email']?.toString() ?? '',
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: const Text('See more ..'),
-                              ),
-                            ],
-                          ))
-                      .toList(),
-                ),
         ),
       ]),
     );

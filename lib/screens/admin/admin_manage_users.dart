@@ -1,4 +1,3 @@
-import 'package:exfactor/models/user_model.dart';
 import 'package:exfactor/screens/admin/admin_add_user.dart';
 import 'package:exfactor/utils/colors.dart';
 import 'package:exfactor/widgets/common/custom_button.dart';

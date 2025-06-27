@@ -1,3 +1,4 @@
+import 'package:exfactor/widgets/common/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:exfactor/services/superbase_service.dart';
 import 'package:exfactor/models/user_model.dart';
@@ -39,10 +40,16 @@ class _SupervisorUpdateUserScreenState
   DateTime? _selectedJoinDate;
   DateTime? _selectedDesignationDate;
 
+  List<Map<String, dynamic>> _supervisors = [];
+  int? _selectedSupervisorId;
+  final List<String> _roles = ['Technician', 'Supervisor'];
+  String? _selectedRole;
+
   @override
   void initState() {
     super.initState();
     _fetchUser();
+    _fetchSupervisors();
   }
 
   @override
@@ -87,9 +94,18 @@ class _SupervisorUpdateUserScreenState
           _user!.designationDate!.isNotEmpty) {
         _selectedDesignationDate = DateTime.tryParse(_user!.designationDate!);
       }
-      _roleController.text = _user?.role ?? '';
+      _selectedRole = _user?.role;
       _profileImageController.text = _user?.profileImage ?? '';
-      _supervisorController.text = _user?.supervisor ?? '';
+      // Try to match supervisor by member_id
+      if (_user?.supervisor != null && _user!.supervisor!.isNotEmpty) {
+        final sup = _supervisors.firstWhere(
+          (s) => s['member_id'].toString() == _user!.supervisor,
+          orElse: () => {},
+        );
+        if (sup.isNotEmpty) {
+          _selectedSupervisorId = sup['member_id'];
+        }
+      }
       _emergencyNameController.text = _user?.emergencyName ?? '';
       _emergencyMobileNumberController.text =
           _user?.emergencyMobileNumber ?? '';
@@ -98,6 +114,13 @@ class _SupervisorUpdateUserScreenState
       _positionController.text = _user?.position ?? '';
     }
     setState(() => _loading = false);
+  }
+
+  Future<void> _fetchSupervisors() async {
+    final supervisors = await SupabaseService.getSupervisors();
+    setState(() {
+      _supervisors = supervisors;
+    });
   }
 
   Future<void> _handleSave() async {
@@ -112,8 +135,8 @@ class _SupervisorUpdateUserScreenState
         'birthday': _birthdayController.text,
         'join_date': _joinDateController.text,
         'designation_date': _designationDateController.text,
-        'role': _roleController.text,
-        'supervisor': _supervisorController.text,
+        'role': _selectedRole ?? '',
+        'supervisor': _selectedSupervisorId?.toString() ?? '',
         'emergency_name': _emergencyNameController.text,
         'emergency_number': _emergencyMobileNumberController.text,
         'emergency_relationship': _emergencyRelationshipController.text,
@@ -146,35 +169,41 @@ class _SupervisorUpdateUserScreenState
     return Scaffold(
       appBar: AppBar(title: const Text('Update Profile')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const Text("First Name"),
               TextFormField(
-                  controller: _firstNameController,
-                  decoration: const InputDecoration(labelText: 'First Name')),
-              const SizedBox(
-                height: 10,
+                controller: _firstNameController,
               ),
+              const SizedBox(
+                height: 15,
+              ),
+              const Text("Last Name"),
               TextFormField(
-                  controller: _lastNameController,
-                  decoration: const InputDecoration(labelText: 'Last Name')),
-              const SizedBox(
-                height: 10,
+                controller: _lastNameController,
               ),
+              const SizedBox(
+                height: 15,
+              ),
+              const Text("Email Address"),
               TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(labelText: 'Email')),
-              const SizedBox(
-                height: 10,
+                controller: _emailController,
               ),
+              const SizedBox(
+                height: 15,
+              ),
+              const Text("Mobile Number"),
               TextFormField(
-                  controller: _mobileController,
-                  decoration: const InputDecoration(labelText: 'Mobile')),
-              const SizedBox(
-                height: 10,
+                controller: _mobileController,
               ),
+              const SizedBox(
+                height: 15,
+              ),
+              const Text("Select Birthday"),
               GestureDetector(
                 onTap: () async {
                   final picked = await showDatePicker(
@@ -192,14 +221,17 @@ class _SupervisorUpdateUserScreenState
                 child: AbsorbPointer(
                   child: TextFormField(
                     controller: _birthdayController,
-                    decoration: const InputDecoration(labelText: 'Birthday'),
                     readOnly: true,
+                    decoration: const InputDecoration(
+                      suffixIcon: Icon(Icons.calendar_today),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(
-                height: 10,
+                height: 15,
               ),
+              const Text(" Select Join Date"),
               GestureDetector(
                 onTap: () async {
                   final picked = await showDatePicker(
@@ -217,14 +249,17 @@ class _SupervisorUpdateUserScreenState
                 child: AbsorbPointer(
                   child: TextFormField(
                     controller: _joinDateController,
-                    decoration: const InputDecoration(labelText: 'Join Date'),
                     readOnly: true,
+                    decoration: const InputDecoration(
+                      suffixIcon: Icon(Icons.calendar_today),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(
-                height: 10,
+                height: 15,
               ),
+              const Text("Select Designation Date"),
               GestureDetector(
                 onTap: () async {
                   final picked = await showDatePicker(
@@ -243,51 +278,89 @@ class _SupervisorUpdateUserScreenState
                 child: AbsorbPointer(
                   child: TextFormField(
                     controller: _designationDateController,
-                    decoration:
-                        const InputDecoration(labelText: 'Designation Date'),
                     readOnly: true,
+                    decoration: const InputDecoration(
+                      suffixIcon: Icon(Icons.calendar_today),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(
-                height: 10,
+                height: 15,
               ),
-              TextFormField(
-                  controller: _roleController,
-                  decoration: const InputDecoration(labelText: 'Role')),
+              const Text("Select Role"),
+              DropdownButtonFormField<String>(
+                value: _selectedRole,
+                items: _roles
+                    .map((role) => DropdownMenuItem(
+                          value: role,
+                          child: Text(role),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedRole = value;
+                  });
+                },
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+              ),
               const SizedBox(
-                height: 10,
+                height: 15,
               ),
-              TextFormField(
-                  controller: _supervisorController,
-                  decoration: const InputDecoration(labelText: 'Supervisor')),
+              const Text("Select Supervisor"),
+              DropdownButtonFormField<int>(
+                value: _selectedSupervisorId,
+                items: _supervisors
+                    .map((sup) => DropdownMenuItem<int>(
+                          value: sup['member_id'],
+                          child:
+                              Text('${sup['first_name']} ${sup['last_name']}'),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedSupervisorId = value;
+                  });
+                },
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+              ),
               const SizedBox(
-                height: 10,
+                height: 15,
               ),
+              const Text("Enter Emergency Contact Name"),
               TextFormField(
-                  controller: _emergencyNameController,
-                  decoration:
-                      const InputDecoration(labelText: 'Emergency Name')),
+                controller: _emergencyNameController,
+              ),
               const SizedBox(
-                height: 10,
+                height: 15,
               ),
+              const Text("Enter Emergency Contact Number"),
               TextFormField(
-                  controller: _emergencyMobileNumberController,
-                  decoration: const InputDecoration(
-                      labelText: 'Emergency Mobile Number')),
+                controller: _emergencyMobileNumberController,
+                keyboardType: TextInputType.phone,
+              ),
               const SizedBox(
-                height: 10,
+                height: 15,
               ),
+              const Text("Select Relationship"),
               TextFormField(
-                  controller: _emergencyRelationshipController,
-                  decoration: const InputDecoration(
-                      labelText: 'Emergency Relationship')),
+                controller: _emergencyRelationshipController,
+              ),
               const SizedBox(
-                height: 10,
+                height: 15,
               ),
+              const Text("Enter Position"),
               TextFormField(
-                  controller: _positionController,
-                  decoration: const InputDecoration(labelText: 'Position')),
+                controller: _positionController,
+              ),
               const SizedBox(
                 height: 24,
               ),

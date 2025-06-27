@@ -17,14 +17,14 @@ class AdminProjectManage extends StatefulWidget {
 
 class _AdminProjectManageState extends State<AdminProjectManage> {
   List<Map<String, dynamic>> statusProjectOverview = [
-    {'label': 'OVER DUE', 'count': 0, 'color': cardDarkRed},
     {'label': 'PENDING', 'count': 0, 'color': cardDarkYellow},
     {'label': 'ON PROGRESS', 'count': 0, 'color': cardDarkGreen},
+    {'label': 'OVER DUE', 'count': 0, 'color': cardDarkRed},
   ];
   List<Map<String, dynamic>> statusTaskOverView = [
-    {'label': 'OVER DUE', 'count': 0, 'color': cardDarkRed},
     {'label': 'PENDING', 'count': 0, 'color': cardDarkYellow},
     {'label': 'ON PROGRESS', 'count': 0, 'color': cardDarkGreen},
+    {'label': 'OVER DUE', 'count': 0, 'color': cardDarkRed},
   ];
 
   // Separate expand/collapse state for projects
@@ -32,6 +32,7 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
   bool showProjectProgress = false;
   bool showProjectOverdue = false;
   bool showProjectComplete = false;
+  bool showProjectArchived = false;
 
   // Separate expand/collapse state for tasks
   bool showTaskPending = false;
@@ -48,6 +49,7 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
   List<Map<String, dynamic>> inProgressTasks = [];
   List<Map<String, dynamic>> overdueTasks = [];
   List<Map<String, dynamic>> pendingTasks = [];
+  List<Map<String, dynamic>> archivedProjects = [];
   bool isLoadingProjectList = true;
   bool isLoadingTaskList = true;
 
@@ -89,9 +91,9 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
     }
     setState(() {
       statusProjectOverview = [
-        {'label': 'OVER DUE', 'count': overdue, 'color': cardDarkRed},
         {'label': 'PENDING', 'count': pending, 'color': cardDarkYellow},
-        {'label': 'ON PROGRESS', 'count': onProgress, 'color': cardDarkGreen},
+        {'label': 'WORKING', 'count': onProgress, 'color': cardDarkGreen},
+        {'label': 'OVER DUE', 'count': overdue, 'color': cardDarkRed},
       ];
       isLoadingProjectOverview = false;
     });
@@ -126,9 +128,9 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
     }
     setState(() {
       statusTaskOverView = [
-        {'label': 'OVER DUE', 'count': overdue, 'color': cardRed},
         {'label': 'PENDING', 'count': pending, 'color': Colors.amber},
-        {'label': 'ON PROGRESS', 'count': onProgress, 'color': cardGreen},
+        {'label': 'WORKING', 'count': onProgress, 'color': cardGreen},
+        {'label': 'OVER DUE', 'count': overdue, 'color': cardRed},
       ];
       isLoadingTaskOverview = false;
     });
@@ -144,6 +146,7 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
     List<Map<String, dynamic>> inProgress = [];
     List<Map<String, dynamic>> overdue = [];
     List<Map<String, dynamic>> pending = [];
+    List<Map<String, dynamic>> archived = [];
     for (final p in projects) {
       final status = (p['status'] ?? '').toString().toLowerCase();
       final endDateStr = p['end_date'] ?? p['project_end_date'] ?? '';
@@ -161,12 +164,15 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
       } else if ((status == 'pending') &&
           (endDate == null || endDate.isAfter(now))) {
         pending.add(p);
+      } else if (status == 'archived') {
+        archived.add(p);
       }
     }
     setState(() {
       inProgressProjects = inProgress;
       overdueProjects = overdue;
       pendingProjects = pending;
+      archivedProjects = archived;
       isLoadingProjectList = false;
     });
   }
@@ -287,7 +293,7 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
           ),
           // In Progress Project Table list  Start
           UserUtils.buildExpandableGroup(
-            title: "On Progress Project",
+            title: "In Progress Project",
             color: cardDarkGreen,
             expanded: showProjectProgress,
             onToggle: () =>
@@ -342,6 +348,24 @@ class _AdminProjectManageState extends State<AdminProjectManage> {
             },
           ),
           const SizedBox(height: 10),
+          // Archived Project Table list Start
+          UserUtils.buildExpandableGroup(
+            title: "Archived Project",
+            color: Colors.grey,
+            expanded: showProjectArchived,
+            onToggle: () =>
+                setState(() => showProjectArchived = !showProjectArchived),
+            groupList: archivedProjects,
+            onSeeMore: (project) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AdminSingleProjectScreen(
+                      projectId: project['project_id']?.toString() ?? ''),
+                ),
+              );
+            },
+          ),
           //mange Tasks
           const SizedBox(
             height: 20,

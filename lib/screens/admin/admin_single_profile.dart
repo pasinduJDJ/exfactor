@@ -3,7 +3,6 @@ import 'package:exfactor/widgets/common/custom_button.dart';
 import 'package:flutter/material.dart';
 import '../../utils/colors.dart';
 import 'package:exfactor/services/superbase_service.dart';
-import 'package:exfactor/screens/admin/admin_manage_users.dart';
 import 'package:exfactor/widgets/utils_widget.dart';
 
 class AdminSingleProfileScreen extends StatefulWidget {
@@ -58,57 +57,89 @@ class _AdminSingleProfileScreenState extends State<AdminSingleProfileScreen> {
             ? "${user!['first_name'] ?? ''} ${user!['last_name'] ?? ''}"
             : "User Profile",
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : user == null
-              ? const Center(child: Text('User not found'))
-              : Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : user == null
+                ? const Center(child: Text('User not found'))
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      const CircleAvatar(
+                        radius: 70,
+                        backgroundColor: Colors.white,
+                        backgroundImage:
+                            AssetImage('assets/images/it-avatar.webp'),
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Personal Information",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
                       Card(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16)),
                         elevation: 4,
                         child: Padding(
-                          padding: const EdgeInsets.all(18),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              CircleAvatar(
-                                radius: 75,
-                                backgroundImage:
-                                    (user!['profile_image'] != null &&
-                                            user!['profile_image']
-                                                .toString()
-                                                .isNotEmpty)
-                                        ? (user!['profile_image']
-                                                    .toString()
-                                                    .startsWith('http')
-                                                ? NetworkImage(
-                                                    user!['profile_image'])
-                                                : AssetImage(
-                                                    user!['profile_image']))
-                                            as ImageProvider
-                                        : null,
-                                child: (user!['profile_image'] == null ||
-                                        user!['profile_image']
-                                            .toString()
-                                            .isEmpty)
-                                    ? const Icon(Icons.person_outline, size: 30)
-                                    : null,
-                              ),
-                              const SizedBox(height: 16),
                               _infoRow('Full Name',
                                   "${user!['first_name'] ?? ''} ${user!['last_name'] ?? ''}"),
+                              const Divider(thickness: 1),
+                              _infoRow(
+                                  'Date of Birth', user!['birthday'] ?? ''),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Company  Information",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Card(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                        elevation: 4,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              _infoRow('Position ', user!['position'] ?? ''),
+                              const Divider(thickness: 1),
+                              _infoRow('Role', user!['role'] ?? ''),
                               const Divider(thickness: 1),
                               _infoRow('Email Address', user!['email'] ?? ''),
                               const Divider(thickness: 1),
                               _infoRow('Mobile Number', user!['mobile'] ?? ''),
-                              const Divider(thickness: 1),
-                              _infoRow(
-                                  'Date of Birth', user!['birthday'] ?? ''),
                               const Divider(thickness: 1),
                               _infoRow('Joined Date', user!['join_date'] ?? ''),
                               const Divider(thickness: 1),
@@ -116,13 +147,38 @@ class _AdminSingleProfileScreenState extends State<AdminSingleProfileScreen> {
                                   user!['designation_date'] ?? ''),
                               const Divider(thickness: 1),
                               _infoRow('Supervisor', user!['supervisor'] ?? ''),
-                              const Divider(thickness: 1),
-                              _infoRow('Permission Type', user!['role'] ?? ''),
-                              const Divider(thickness: 1),
-                              const SizedBox(height: 10),
-                              // Emergency contact fields if available
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Emergency Contact Information",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Card(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                        elevation: 4,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
                               if (user!['emergency_name'] != null)
-                                _infoRow('Emergency Name',
+                                _infoRow('Contact Name',
                                     user!['emergency_name'] ?? ''),
                               const Divider(thickness: 1),
                               if (user!['emergency_relationship'] != null)
@@ -132,64 +188,66 @@ class _AdminSingleProfileScreenState extends State<AdminSingleProfileScreen> {
                               if (user!['emergency_number'] != null)
                                 _infoRow('Contact number',
                                     user!['emergency_number'] ?? ''),
-                              const SizedBox(
-                                height: 15,
-                              ),
-                              CustomButton(
-                                text: "Remove Member",
-                                onPressed: () async {
-                                  setState(() {
-                                    isLoading = true;
-                                  });
-                                  try {
-                                    final userIdInt = int.tryParse(
-                                        user!['member_id'].toString());
-                                    if (userIdInt == null) {
-                                      if (mounted) {
-                                        UserUtils.showToast(
-                                          "Error: member_id is null or invalid.",
-                                          Colors.red,
-                                          context,
-                                        );
-                                      }
-                                    } else {
-                                      await SupabaseService.deleteUser(
-                                          userIdInt);
-                                      if (mounted) {
-                                        UserUtils.showToast(
-                                          "User removed successfully.",
-                                          Colors.green,
-                                          context,
-                                        );
-                                        Navigator.of(context).pop();
-                                      }
-                                    }
-                                  } catch (e) {
-                                    if (mounted) {
-                                      UserUtils.showToast(
-                                        "Failed to remove user: ${e.toString()}",
-                                        Colors.red,
-                                        context,
-                                      );
-                                    }
-                                  } finally {
-                                    if (mounted) {
-                                      setState(() {
-                                        isLoading = false;
-                                      });
-                                    }
-                                  }
-                                },
-                                backgroundColor: cardDarkRed,
-                                width: double.infinity / 2,
-                              ),
                             ],
                           ),
                         ),
                       ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      CustomButton(
+                        text: "Remove Member",
+                        onPressed: () async {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          try {
+                            final userIdInt =
+                                int.tryParse(user!['member_id'].toString());
+                            if (userIdInt == null) {
+                              if (mounted) {
+                                UserUtils.showToast(
+                                  "Error: member_id is null or invalid.",
+                                  Colors.red,
+                                  context,
+                                );
+                              }
+                            } else {
+                              await SupabaseService.deleteUser(userIdInt);
+                              if (mounted) {
+                                UserUtils.showToast(
+                                  "User removed successfully.",
+                                  Colors.green,
+                                  context,
+                                );
+                                Navigator.of(context).pop();
+                              }
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              UserUtils.showToast(
+                                "Failed to remove user: ${e.toString()}",
+                                Colors.red,
+                                context,
+                              );
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                isLoading = false;
+                              });
+                            }
+                          }
+                        },
+                        backgroundColor: cardDarkRed,
+                        width: double.infinity / 2,
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
                     ],
                   ),
-                ),
+      ),
     );
   }
 

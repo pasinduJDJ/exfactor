@@ -71,7 +71,7 @@ class _TechnicalMainScreenState extends State<TechnicalMainScreen> {
     return BaseLayout(
       title: widget.user.firstName ?? '',
       subtitle: widget.user.position ?? '',
-      profileImage: 'assets/images/man-avatar.png',
+      profileImage: 'assets/images/it-avatar.webp',
       onProfileTap: () {},
       body: _screens[_currentIndex],
       currentIndex: _currentIndex,
